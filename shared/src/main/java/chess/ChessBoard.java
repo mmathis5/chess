@@ -9,8 +9,9 @@ package chess;
 public class ChessBoard {
 
     public ChessBoard() {
-        
-    }
+        //attributes needed are pieces on the board(?), what is at each square (64, none if nothing)
+        //when we initialize, do potential spaces/their corresponding pieces need to be there
+            }
 
     /**
      * Adds a chess piece to the chessboard
@@ -29,6 +30,7 @@ public class ChessBoard {
      * @return Either the piece at the position, or null if no piece is at that
      * position
      */
+
     public ChessPiece getPiece(ChessPosition position) {
         throw new RuntimeException("Not implemented");
     }
