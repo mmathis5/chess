@@ -10,8 +10,13 @@ import java.util.ArrayList;
  * signature of the existing methods.
  */
 public class ChessPiece {
+    private final ChessGame.TeamColor TeamColor;
+    private final ChessPiece.PieceType PieceType;
+
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+        this.TeamColor = pieceColor;
+        this.PieceType = type;
     }
 
     /**
@@ -30,14 +35,14 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        throw new RuntimeException("Not implemented");
+        return this.TeamColor;
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        throw new RuntimeException("Not implemented");
+        return this.PieceType;
     }
 
     /**
@@ -50,6 +55,10 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ArrayList<ChessMove> moves = new ArrayList<>();
         //this will return an array of the possible moves.
+        //she's not even close to being done:')
+        if (getPieceType() == ROOK){
+            moves.add()
+        }
         return moves;
 
     }
