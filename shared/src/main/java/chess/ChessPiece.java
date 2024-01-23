@@ -2,6 +2,7 @@ package chess;
 
 import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -10,13 +11,13 @@ import java.util.ArrayList;
  * signature of the existing methods.
  */
 public class ChessPiece {
-    private final ChessGame.TeamColor TeamColor;
-    private final ChessPiece.PieceType PieceType;
+    private final ChessGame.TeamColor team;
+    private final ChessPiece.PieceType type;
 
 
-    public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
-        this.TeamColor = pieceColor;
-        this.PieceType = type;
+    public ChessPiece(ChessGame.TeamColor team, ChessPiece.PieceType type) {
+        this.team = team;
+        this.type = type;
     }
 
     /**
@@ -45,6 +46,27 @@ public class ChessPiece {
         return this.PieceType;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessPiece that = (ChessPiece) o;
+        return TeamColor == that.TeamColor && PieceType == that.PieceType;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(TeamColor, PieceType);
+    }
+
+    @Override
+    public String toString() {
+        return "ChessPiece{" +
+                "TeamColor=" + TeamColor +
+                ", PieceType=" + PieceType +
+                '}';
+    }
+
     /**
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
@@ -53,50 +75,11 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        // this accounts for other pieces that would block the move.
-        ArrayList<ChessMove> moves = new ArrayList<>();
+        //don't code queen, just combine the moves from rook and bishop.
+        switch(type){
+            case PieceType.BISHOP:
+                new Bishop ;
 
-        //Bishop moves diagonally in any direction
-        if (board.getPiece(myPosition).getPieceType() == PieceType.BISHOP){
-            int row = myPosition.getRow();
-            int column = myPosition.getColumn();
-            //up right
-            while (0 < row && row < 8 && column < 8 && column > 0){
-                moves.add(new ChessMove( new ChessPosition(row, column), new ChessPosition(row + 1,column + 1), PieceType.BISHOP));
-                row = row + 1;
-                column = column + 1;
-            }
-            //reset position again
-            int row2 = myPosition.getRow();
-            int column2 = myPosition.getColumn();
-            //down right
-            while (0 < row2 && row2 < 8 && column2 < 8 && column2 > 0){
-                moves.add(new ChessMove( new ChessPosition(row2, column2), new ChessPosition(row2 - 1,column2 + 1), PieceType.BISHOP));
-                row2 = row2 - 1;
-                column2 = column2 + 1;
-            }
-
-            //reset position again
-            int row3 = myPosition.getRow();
-            int column3 = myPosition.getColumn();
-            //down left
-            while ((0 < row3 && row3 < 8 && 0 < column3 && column3 < 8)){
-                moves.add(new ChessMove( new ChessPosition(row3, column3), new ChessPosition(row3 - 1,column3 - 1), PieceType.BISHOP));
-                row3 = row3 - 1;
-                column3 = column3 - 1;
-            }
-            //reset local variables. I had to rename them but this is messy and I hate it:/
-            //I could probably set it up in a for loop but I really don't want to:/
-            int row1 = myPosition.getRow();
-            int column1 = myPosition.getColumn();
-            //up left
-            while (0 < row1 && row1 < 8 && column1 < 8 && column > 0){
-                moves.add(new ChessMove( new ChessPosition(row1, column1), new ChessPosition(row1 + 1,column1 - 1), PieceType.BISHOP));
-                row1 = row1 + 1;
-                column1 = column1 - 1;
-            }
         }
-        return moves;
-
     }
 }
