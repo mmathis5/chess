@@ -28,7 +28,12 @@ public class Bishop {
         int column = myPosition.getColumn();
         //up right
         while (1 < row && row < 8 && column < 8 && column > 1) {
-            if (board.getPiece(new ChessPosition(row +1 , column +1)).getPieceType() != null){
+            ChessPiece piece = board.getPiece(new ChessPosition(row + 1, column + 1));
+            if (piece != null && piece.getPieceType() != null) {
+                //checks for enemy piece
+                if (piece.getTeamColor() != this.myColor){
+                    moves.add(new ChessMove(myPosition, new ChessPosition(row + 1, column + 1), null));
+                }
                 break;
             }
             moves.add(new ChessMove(myPosition, new ChessPosition(row + 1, column + 1), null));
@@ -39,7 +44,12 @@ public class Bishop {
         column = myPosition.getColumn();
         //down right
         while (1 < row && row < 8 && column < 8 && column > 1) {
-            if (board.getPiece(new ChessPosition(row - 1 , column +1)).getPieceType() != null){
+            ChessPiece piece = board.getPiece(new ChessPosition(row -1, column + 1) );
+            if (piece != null && piece.getPieceType() != null) {
+                //checks for enemy piece
+                if (piece.getTeamColor() != this.myColor) {
+                    moves.add(new ChessMove(myPosition, new ChessPosition(row - 1, column + 1), null));
+                }
                 break;
             }
             moves.add(new ChessMove(myPosition, new ChessPosition(row - 1, column + 1), null));
@@ -51,7 +61,12 @@ public class Bishop {
         column = myPosition.getColumn();
         //down left
         while ((1 < row && row < 8 && 1 < column && column < 8)) {
-            if (board.getPiece(new ChessPosition(row -1, column -1)).getPieceType() != null){
+            ChessPiece piece = board.getPiece(new ChessPosition(row - 1, column - 1));
+            if (piece != null && piece.getPieceType() != null) {
+                //checks for enemy piece
+                if (piece.getTeamColor() != this.myColor) {
+                    moves.add(new ChessMove(myPosition, new ChessPosition(row - 1, column - 1), null));
+                }
                 break;
             }
             moves.add(new ChessMove(myPosition, new ChessPosition(row - 1, column - 1), null));
@@ -62,7 +77,12 @@ public class Bishop {
         column = myPosition.getColumn();
         //up left
         while (1 < row && row < 8 && column < 8 && column > 1) {
-            if (board.getPiece(new ChessPosition(row + 1, column -1 )).getPieceType() != null){
+            ChessPiece piece = board.getPiece(new ChessPosition(row + 1, column - 1));
+            if (piece != null && piece.getPieceType() != null) {
+                //checks for enemy piece
+                if (piece.getTeamColor() != this.myColor) {
+                    moves.add(new ChessMove(myPosition, new ChessPosition(row + 1, column - 1), null));
+                }
                 break;
             }
             moves.add(new ChessMove(myPosition, new ChessPosition(row + 1, column - 1), null));
