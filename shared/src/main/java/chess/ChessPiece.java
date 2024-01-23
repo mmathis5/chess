@@ -93,7 +93,7 @@ public class ChessPiece {
             case PieceType.ROOK:
                 moves.addAll(new Rook(board, myPosition, this.team).pieceMovesRook());
             case PieceType.KNIGHT:
-
+                moves.addAll(new Knight(board, myPosition, this.team).pieceMovesKnight());
             case PieceType.KING:
 
             case PieceType.QUEEN:
