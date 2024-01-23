@@ -56,9 +56,10 @@ public class ChessPiece {
         ArrayList<ChessMove> moves = new ArrayList<>();
         //this will return an array of the possible moves.
         //she's not even close to being done:')
-        if (getPieceType() == ROOK){
-            moves.add()
-        }
+//        if (getPieceType() == PieceType.ROOK){
+//            //this has to be an array of type chess move
+//            moves.add(3);
+//        }
         return moves;
 
     }

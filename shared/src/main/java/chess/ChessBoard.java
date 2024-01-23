@@ -7,7 +7,7 @@ package chess;
  * signature of the existing methods.
  */
 public class ChessBoard {
-    private ChessPiece[][] squares = new ChessPiece[8][8];
+    private final ChessPiece[][] squares = new ChessPiece[8][8];
     public ChessBoard() {
         //attributes needed are pieces on the board(?), what is at each square (64, none if nothing)
         //when we initialize, do potential spaces/their corresponding pieces need to be there?
