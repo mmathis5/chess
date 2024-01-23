@@ -53,6 +53,7 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+        // this accounts for other pieces that would block the move.
         ArrayList<ChessMove> moves = new ArrayList<>();
 
         //Bishop moves diagonally in any direction
@@ -85,6 +86,7 @@ public class ChessPiece {
                 column3 = column3 - 1;
             }
             //reset local variables. I had to rename them but this is messy and I hate it:/
+            //I could probably set it up in a for loop but I really don't want to:/
             int row1 = myPosition.getRow();
             int column1 = myPosition.getColumn();
             //up left
