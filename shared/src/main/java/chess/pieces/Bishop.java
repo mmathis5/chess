@@ -28,38 +28,46 @@ public class Bishop {
         int column = myPosition.getColumn();
         //up right
         while (1 < row && row < 8 && column < 8 && column > 1) {
+            if (board.getPiece(new ChessPosition(row +1 , column +1)).getPieceType() != null){
+                break;
+            }
             moves.add(new ChessMove(myPosition, new ChessPosition(row + 1, column + 1), null));
             row = row + 1;
             column = column + 1;
         }
-        //reset position again
-        int row2 = myPosition.getRow();
-        int column2 = myPosition.getColumn();
+        row = myPosition.getRow();
+        column = myPosition.getColumn();
         //down right
-        while (1 < row2 && row2 < 8 && column2 < 8 && column2 > 1) {
-            moves.add(new ChessMove(myPosition, new ChessPosition(row2 - 1, column2 + 1), null));
-            row2 = row2 - 1;
-            column2 = column2 + 1;
+        while (1 < row && row < 8 && column < 8 && column > 1) {
+            if (board.getPiece(new ChessPosition(row - 1 , column +1)).getPieceType() != null){
+                break;
+            }
+            moves.add(new ChessMove(myPosition, new ChessPosition(row - 1, column + 1), null));
+            row = row - 1;
+            column = column + 1;
         }
-
         //reset position again
-        int row3 = myPosition.getRow();
-        int column3 = myPosition.getColumn();
+        row = myPosition.getRow();
+        column = myPosition.getColumn();
         //down left
-        while ((1 < row3 && row3 < 8 && 1 < column3 && column3 < 8)) {
-            moves.add(new ChessMove(myPosition, new ChessPosition(row3 - 1, column3 - 1), null));
-            row3 = row3 - 1;
-            column3 = column3 - 1;
+        while ((1 < row && row < 8 && 1 < column && column < 8)) {
+            if (board.getPiece(new ChessPosition(row -1, column -1)).getPieceType() != null){
+                break;
+            }
+            moves.add(new ChessMove(myPosition, new ChessPosition(row - 1, column - 1), null));
+            row = row - 1;
+            column = column - 1;
         }
-        //reset local variables. I had to rename them but this is messy and I hate it:/
-        //I could probably set it up in a for loop but I really don't want to:/
-        int row1 = myPosition.getRow();
-        int column1 = myPosition.getColumn();
+        row = myPosition.getRow();
+        column = myPosition.getColumn();
         //up left
-        while (1 < row1 && row1 < 8 && column1 < 8 && column > 1) {
-            moves.add(new ChessMove(myPosition, new ChessPosition(row1 + 1, column1 - 1), null));
-            row1 = row1 + 1;
-            column1 = column1 - 1;
+        while (1 < row && row < 8 && column < 8 && column > 1) {
+            if (board.getPiece(new ChessPosition(row + 1, column -1 )).getPieceType() != null){
+                break;
+            }
+            moves.add(new ChessMove(myPosition, new ChessPosition(row + 1, column - 1), null));
+            row = row+ 1;
+            column = column - 1;
         }
            return moves;
     }

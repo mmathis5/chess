@@ -3,6 +3,16 @@ package chess;
 import java.util.Collection;
 import java.util.ArrayList;
 import java.util.Objects;
+import chess.pieces.Bishop;
+import chess.pieces.King;
+import chess.pieces.Queen;
+import chess.pieces.Knight;
+import chess.pieces.Rook;
+import chess.pieces.Pawn;
+
+
+
+
 
 /**
  * Represents a single chess piece
@@ -36,14 +46,14 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        return this.TeamColor;
+        return this.team;
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        return this.PieceType;
+        return this.type;
     }
 
     @Override
@@ -51,19 +61,19 @@ public class ChessPiece {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChessPiece that = (ChessPiece) o;
-        return TeamColor == that.TeamColor && PieceType == that.PieceType;
+        return team == that.team && type == that.type;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(TeamColor, PieceType);
+        return Objects.hash(team, type);
     }
 
     @Override
     public String toString() {
         return "ChessPiece{" +
-                "TeamColor=" + TeamColor +
-                ", PieceType=" + PieceType +
+                "TeamColor=" + team +
+                ", PieceType=" + type +
                 '}';
     }
 
@@ -75,11 +85,21 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        //don't code queen, just combine the moves from rook and bishop.
+        //don't code a class for queen, just combine the moves from rook and bishop.
+        ArrayList<ChessMove> moves = new ArrayList<>();
         switch(type){
             case PieceType.BISHOP:
-                new Bishop ;
+                moves.addAll(new Bishop(board, myPosition, this.team).pieceMovesBishop());
+            case PieceType.ROOK:
 
+            case PieceType.KNIGHT:
+
+            case PieceType.KING:
+
+            case PieceType.QUEEN:
+
+            case PieceType.PAWN:
         }
+        return moves;
     }
 }
