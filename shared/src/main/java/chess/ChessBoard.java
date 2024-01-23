@@ -9,10 +9,7 @@ package chess;
 public class ChessBoard {
     private final ChessPiece[][] squares = new ChessPiece[8][8];
     public ChessBoard() {
-        //attributes needed are pieces on the board(?), what is at each square (64, none if nothing)
-        //when we initialize, do potential spaces/their corresponding pieces need to be there?
-        //I swear on my life that I worked on the project but I just don't really have a ton of code to show for it lol.
-        //gotta get those git commits in
+
             }
 
     /**
