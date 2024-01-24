@@ -27,7 +27,7 @@ public class Bishop {
         int row = myPosition.getRow();
         int column = myPosition.getColumn();
         //up right
-        while (1 < row && row < 8 && column < 8 && column > 1) {
+        while (row < 8 && column < 8) {
             ChessPiece piece = board.getPiece(new ChessPosition(row + 1, column + 1));
             if (piece != null && piece.getPieceType() != null) {
                 //checks for enemy piece
@@ -43,7 +43,7 @@ public class Bishop {
         row = myPosition.getRow();
         column = myPosition.getColumn();
         //down right
-        while (1 < row && row < 8 && column < 8 && column > 1) {
+        while (row > 1 && column < 8) {
             ChessPiece piece = board.getPiece(new ChessPosition(row -1, column + 1) );
             if (piece != null && piece.getPieceType() != null) {
                 //checks for enemy piece
@@ -60,7 +60,7 @@ public class Bishop {
         row = myPosition.getRow();
         column = myPosition.getColumn();
         //down left
-        while ((1 < row && row < 8 && 1 < column && column < 8)) {
+        while ((1 < row && 1 < column)) {
             ChessPiece piece = board.getPiece(new ChessPosition(row - 1, column - 1));
             if (piece != null && piece.getPieceType() != null) {
                 //checks for enemy piece
@@ -76,7 +76,7 @@ public class Bishop {
         row = myPosition.getRow();
         column = myPosition.getColumn();
         //up left
-        while (1 < row && row < 8 && column < 8 && column > 1) {
+        while (8 > row && column > 1) {
             ChessPiece piece = board.getPiece(new ChessPosition(row + 1, column - 1));
             if (piece != null && piece.getPieceType() != null) {
                 //checks for enemy piece

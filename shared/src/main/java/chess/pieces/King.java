@@ -21,8 +21,56 @@ public class King {
     }
 
     public Collection<ChessMove> pieceMovesKing() {
-        ArrayList<ChessMove> moves = new ArrayList<>();
 
+        ArrayList<ChessMove> moves = new ArrayList<>();
+        int row = myPosition.getRow();
+        int column = myPosition.getColumn();
+        ArrayList<ChessMove> possibleMoves = new ArrayList<>();
+        //up
+        if (row < 8) {
+            possibleMoves.add(new ChessMove(this.myPosition, new ChessPosition(row + 1, column), null));
+        }
+        //up right
+        if (row < 8 && column < 8) {
+            possibleMoves.add(new ChessMove(this.myPosition, new ChessPosition(row + 1, column + 1), null));
+        }
+        //right
+        if (column < 8) {
+            possibleMoves.add(new ChessMove(this.myPosition, new ChessPosition(row, column + 1), null));
+        }
+        //down right
+        if (row > 1 && column < 8) {
+            possibleMoves.add(new ChessMove(this.myPosition, new ChessPosition(row - 1, column + 1), null));
+        }
+        //down
+        if (row > 1) {
+            possibleMoves.add(new ChessMove(this.myPosition, new ChessPosition(row - 1, column), null));
+        }
+        //down left
+        if (row > 1 && column > 1) {
+            possibleMoves.add(new ChessMove(this.myPosition, new ChessPosition(row - 1, column - 1), null));
+        }
+        //left
+        if (column > 1) {
+            possibleMoves.add(new ChessMove(this.myPosition, new ChessPosition(row, column -1), null));
+        }
+        //up left
+        if (row < 8 && column > 1) {
+            possibleMoves.add(new ChessMove(this.myPosition, new ChessPosition(row + 1, column -1), null));
+        }
+
+        for (int i = 0; i < possibleMoves.size() ; i ++){
+            ChessPosition possibleMove = possibleMoves.get(i).getEndPosition();
+            ChessPiece piece = board.getPiece(possibleMove);
+            if (piece == null){
+                moves.add(new ChessMove(myPosition, possibleMove, null));
+            }
+            else{
+                if (piece.getTeamColor() != this.myColor){
+                    moves.add(new ChessMove(myPosition, possibleMove, null));
+                }
+            }
+        }
         return moves;
     }
 }

@@ -87,18 +87,24 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         //don't code a class for queen, just combine the moves from rook and bishop.
         ArrayList<ChessMove> moves = new ArrayList<>();
-        switch(type){
-            case PieceType.BISHOP:
-                moves.addAll(new Bishop(board, myPosition, this.team).pieceMovesBishop());
-            case PieceType.ROOK:
-                moves.addAll(new Rook(board, myPosition, this.team).pieceMovesRook());
-            case PieceType.KNIGHT:
-                moves.addAll(new Knight(board, myPosition, this.team).pieceMovesKnight());
-            case PieceType.KING:
-
-            case PieceType.QUEEN:
-
-            case PieceType.PAWN:
+        if (board.getPiece(myPosition).getPieceType() == PieceType.BISHOP){
+            moves.addAll(new Bishop(board, myPosition, this.team).pieceMovesBishop());
+        }
+        if (board.getPiece(myPosition).getPieceType() == PieceType.ROOK){
+            moves.addAll(new Rook(board, myPosition, this.team).pieceMovesRook());
+        }
+        if (board.getPiece(myPosition).getPieceType() == PieceType.KNIGHT){
+            moves.addAll(new Knight(board, myPosition, this.team).pieceMovesKnight());
+        }
+        if (board.getPiece(myPosition).getPieceType() == PieceType.KING){
+            moves.addAll(new King(board, myPosition, this.team).pieceMovesKing());
+        }
+        if (board.getPiece(myPosition).getPieceType() == PieceType.QUEEN){
+            moves.addAll(new Rook(board, myPosition, this.team).pieceMovesRook());
+            moves.addAll(new Bishop(board, myPosition, this.team).pieceMovesBishop());
+        }
+        if (board.getPiece(myPosition).getPieceType() == PieceType.PAWN){
+            moves.addAll(new Pawn(board, myPosition, this.team).pieceMovesPawn());
         }
         return moves;
     }

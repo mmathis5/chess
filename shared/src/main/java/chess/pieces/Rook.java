@@ -25,7 +25,7 @@ public class Rook {
         int row = myPosition.getRow();
         int column = myPosition.getColumn();
         //up
-        while (0 < row && row < 8 && column < 8 && column > 1) {
+        while (0 < row && row < 8) {
             ChessPiece piece = board.getPiece(new ChessPosition(row + 1, column));
             if (piece != null && piece.getPieceType() != null) {
                 //checks for enemy piece
@@ -41,7 +41,7 @@ public class Rook {
         row = myPosition.getRow();
         column = myPosition.getColumn();
         //left
-        while (1 < row && row < 8 && column < 8 && column > 1) {
+        while (column < 8 && column > 1) {
             ChessPiece piece = board.getPiece(new ChessPosition(row, column - 1) );
             if (piece != null && piece.getPieceType() != null) {
                 //checks for enemy piece
@@ -57,7 +57,7 @@ public class Rook {
         row = myPosition.getRow();
         column = myPosition.getColumn();
         //down
-        while ((1 < row && row < 8 && 1 < column && column < 8)) {
+        while ((1 < row)) {
             ChessPiece piece = board.getPiece(new ChessPosition(row -1, column));
             if (piece != null && piece.getPieceType() != null) {
                 //checks for enemy piece
@@ -72,7 +72,7 @@ public class Rook {
         row = myPosition.getRow();
         column = myPosition.getColumn();
         //right
-        while (1 < row && row < 8 && column < 8 && column > 1) {
+        while (column < 8) {
             ChessPiece piece = board.getPiece(new ChessPosition(row, column + 1));
             if (piece != null && piece.getPieceType() != null) {
                 //checks for enemy piece
