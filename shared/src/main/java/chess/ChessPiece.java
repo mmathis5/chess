@@ -76,7 +76,6 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        //don't code a class for queen, just combine the moves from rook and bishop.
         ArrayList<ChessMove> moves = new ArrayList<>();
         if (board.getPiece(myPosition).getPieceType() == PieceType.BISHOP || board.getPiece(myPosition).getPieceType() == PieceType.QUEEN){
             int row = myPosition.getRow();
@@ -144,7 +143,6 @@ public class ChessPiece {
                 row = row+ 1;
                 column = column - 1;
             }
-            return moves;
         }
         if (board.getPiece(myPosition).getPieceType() == PieceType.ROOK || board.getPiece(myPosition).getPieceType() == PieceType.QUEEN){
             int row = myPosition.getRow();
