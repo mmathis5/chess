@@ -11,8 +11,8 @@ import java.util.Collection;
 public class ChessGame {
 
     private TeamColor turn;
+    private ChessBoard board;
     public ChessGame() {
-        this.turn = TeamColor.WHITE;
     }
 
     /**
@@ -47,7 +47,8 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        //returns the array of possible moves from ChessPiece.java
+        return board.getPiece(startPosition).pieceMoves(board, startPosition);
     }
 
     /**
@@ -57,7 +58,19 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+
+        ChessPiece piece = board.getPiece(move.getStartPosition());
+        board.removePiece(move.getStartPosition());
+        //promotion case
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN && move.getPromotionPiece() != null){
+            //The getPromotionPieceMethod return the ChessPiece.PieceType attribute, not the whole piece type.
+            //I just made a new piece to fix this, but I don't think that's a very
+            //elegant solution. Can I change the expected return type of the function?
+            board.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), move.getPromotionPiece()));
+        }
+        else{
+            board.addPiece(move.getEndPosition(), piece);
+        }
     }
 
     /**
@@ -67,7 +80,9 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        //find the location of the king
+        //
+        return true;
     }
 
     /**
@@ -77,7 +92,11 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        //find the location of the king
+        //get every possible move
+        //loop through them and return false if isInCheck return false
+        return true;
+
     }
 
     /**
@@ -88,7 +107,7 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return true;
     }
 
     /**
@@ -97,7 +116,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+
     }
 
     /**
@@ -106,6 +125,7 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return this.board;
     }
+
 }
