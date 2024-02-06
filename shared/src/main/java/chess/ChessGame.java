@@ -1,5 +1,6 @@
 package chess;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -13,6 +14,7 @@ public class ChessGame {
 
     private TeamColor turn;
     private ChessBoard board = new ChessBoard();
+    private InvalidMoveException invalidMoveException;
     public ChessGame() {
     }
 
@@ -49,27 +51,27 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         //figure out piece type and color
-        ChessPiece piece = board.getPiece(startPosition);
-        ChessGame.TeamColor team = board.getPiece(startPosition).getTeamColor();
-        //returns the array of possible moves from ChessPiece.java
+//        ChessPiece piece = board.getPiece(startPosition);
+//        ChessGame.TeamColor teamColor = board.getPiece(startPosition).getTeamColor();
+//        //returns the array of possible moves from ChessPiece.java
+//        ArrayList<ChessMove> moves = new ArrayList<>();
+//        ArrayList<ChessMove> potentialMoves = new ArrayList<>();
+//        potentialMoves.addAll(this.board.getPiece(startPosition).pieceMoves(board, startPosition));
+//        for (int i = 0; i < potentialMoves.size(); i++) {
+//            ChessMove move = potentialMoves.get(i);
+//            ChessPosition endPosition = move.getEndPosition();
+//            //duplicate the current game board
+//            ChessBoard unalteredBoard = duplicateBoard();
+//            //make hypothetical move
+//            board.addPiece(endPosition, piece);
+//            if (!isInCheck(teamColor)){
+//                moves.add(potentialMoves.get(i));
+//            }
+//            board = unalteredBoard;
+//        }
+//        return moves;
         ArrayList<ChessMove> moves = new ArrayList<>();
-        ArrayList<ChessMove> potentialMoves = new ArrayList<>();
-        potentialMoves.addAll(this.board.getPiece(startPosition).pieceMoves(board, startPosition));
-        for (int i = 0; i < potentialMoves.size(); i++) {
-            ChessMove move = potentialMoves.get(i);
-            ChessPosition endPosition = move.getEndPosition();
-            //duplicate the current game board
-            ChessBoard unalteredBoard = duplicateBoard();
-            //make hypothetical move
-            //this is causing a stack overflow error:((
-            try{
-                makeMove(move);
-                moves.add(potentialMoves.get(i));
-                board = unalteredBoard;
-            }
-            catch (InvalidMoveException e){
-            }
-        }
+        moves.addAll(this.board.getPiece(startPosition).pieceMoves(board, startPosition));
         return moves;
     }
 
@@ -83,6 +85,12 @@ public class ChessGame {
         //duplicate board
         ChessBoard initialBoard = duplicateBoard();
         ChessPiece piece = board.getPiece(move.getStartPosition());
+        //check if move is invalid because there is no piece there
+        if (piece == null){
+            throw new InvalidMoveException("there is no piece at the starting location");
+        }
+        ArrayList<ChessMove> moves = new ArrayList<>();
+        moves.addAll(this.board.getPiece(move.getStartPosition()).pieceMoves(board, move.getStartPosition()));
         ChessGame.TeamColor team = board.getPiece(move.getStartPosition()).getTeamColor();
         board.removePiece(move.getStartPosition());
         //promotion case
@@ -94,6 +102,9 @@ public class ChessGame {
         }
         if (move.getPromotionPiece() == null){
             board.addPiece(move.getEndPosition(), piece);
+        }
+        if (!moves.contains(move)){
+            throw new InvalidMoveException("You are attempting to make a move that falls outside of the rules of this piece");
         }
         if (isInCheck(team)){
             board = initialBoard;
@@ -215,6 +226,24 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
+        int row = 1;
+        int col = 1;
+        while (row < 9){
+            while (col < 9){
+                ArrayList<ChessMove> moves = new ArrayList<>();
+                if (board.getPiece(new ChessPosition(row, col) )!= null){
+                    if (board.getPiece(new ChessPosition(row, col)).getTeamColor() == teamColor){
+                        moves.addAll(validMoves(new ChessPosition(row, col)));
+                        if (!moves.isEmpty()){
+                            return false;
+                        }
+                    }
+                }
+                col += 1;
+            }
+            col = 1;
+            row += 1;
+        }
         return true;
     }
 
