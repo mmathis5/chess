@@ -48,8 +48,29 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+        //figure out piece type and color
+        ChessPiece piece = board.getPiece(startPosition);
+        ChessGame.TeamColor team = board.getPiece(startPosition).getTeamColor();
         //returns the array of possible moves from ChessPiece.java
-        return this.board.getPiece(startPosition).pieceMoves(board, startPosition);
+        ArrayList<ChessMove> moves = new ArrayList<>();
+        ArrayList<ChessMove> potentialMoves = new ArrayList<>();
+        potentialMoves.addAll(this.board.getPiece(startPosition).pieceMoves(board, startPosition));
+        for (int i = 0; i < potentialMoves.size(); i++) {
+            ChessMove move = potentialMoves.get(i);
+            ChessPosition endPosition = move.getEndPosition();
+            //duplicate the current game board
+            ChessBoard unalteredBoard = duplicateBoard();
+            //make hypothetical move
+            //this is causing a stack overflow error:((
+            try{
+                makeMove(move);
+                moves.add(potentialMoves.get(i));
+                board = unalteredBoard;
+            }
+            catch (InvalidMoveException e){
+            }
+        }
+        return moves;
     }
 
     /**
@@ -59,8 +80,10 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-
+        //duplicate board
+        ChessBoard initialBoard = duplicateBoard();
         ChessPiece piece = board.getPiece(move.getStartPosition());
+        ChessGame.TeamColor team = board.getPiece(move.getStartPosition()).getTeamColor();
         board.removePiece(move.getStartPosition());
         //promotion case
         if (piece.getPieceType() == ChessPiece.PieceType.PAWN && move.getPromotionPiece() != null){
@@ -69,8 +92,12 @@ public class ChessGame {
             //elegant solution. Can I change the expected return type of the function?
             board.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), move.getPromotionPiece()));
         }
-        else{
+        if (move.getPromotionPiece() == null){
             board.addPiece(move.getEndPosition(), piece);
+        }
+        if (isInCheck(team)){
+            board = initialBoard;
+            throw new InvalidMoveException();
         }
     }
 
