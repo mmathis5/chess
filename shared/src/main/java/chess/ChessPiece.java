@@ -348,8 +348,16 @@ public class ChessPiece {
                     moves.add(new ChessMove(myPosition, new ChessPosition(row - 1, column), null));
                 }
                 //check for possible kills
-                ChessPiece downRightKill = board.getPiece(new ChessPosition(row -1, column + 1));
-                ChessPiece downLeftKill = board.getPiece(new ChessPosition(row -1, column - 1));
+                ChessPiece downRightKill = null;
+                ChessPiece downLeftKill = null;
+                //downRightKill invalid for black col 1
+                if (column != 8) {
+                    downRightKill = board.getPiece(new ChessPosition(row - 1, column + 1));
+                }
+                //downLeftKill invalid for black col 1
+                if (column != 1){
+                    downLeftKill = board.getPiece(new ChessPosition(row -1, column - 1));
+                }
                 if (downRightKill != null && downRightKill.getTeamColor() == ChessGame.TeamColor.WHITE){
                     //check if the right kill will result in a promotion
                     if (row -1 == 1){
@@ -383,8 +391,16 @@ public class ChessPiece {
                     moves.add(new ChessMove(myPosition, new ChessPosition(row + 1, column), null));
                 }
                 //check for possible kills
-                ChessPiece upRightKill = board.getPiece(new ChessPosition(row+1, column+1));
-                ChessPiece upLeftKill = board.getPiece(new ChessPosition(row+1, column-1));
+                ChessPiece upRightKill = null;
+                ChessPiece upLeftKill = null;
+                //upRightKill invalid for col 8
+                if (column != 8){
+                    upRightKill = board.getPiece(new ChessPosition(row+1, column+1));
+                }
+                //upLeftKill invalid for col 1
+                if (column != 1){
+                    upLeftKill = board.getPiece(new ChessPosition(row+1, column-1));
+                }
                 if (upRightKill != null && upRightKill.getTeamColor() == ChessGame.TeamColor.BLACK){
                     //check if the up right kill will result in a promotion
                     if (row + 1 == 8){

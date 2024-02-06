@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -11,7 +12,7 @@ import java.util.Collection;
 public class ChessGame {
 
     private TeamColor turn;
-    private ChessBoard board;
+    private ChessBoard board = new ChessBoard();
     public ChessGame() {
     }
 
@@ -48,7 +49,7 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         //returns the array of possible moves from ChessPiece.java
-        return board.getPiece(startPosition).pieceMoves(board, startPosition);
+        return this.board.getPiece(startPosition).pieceMoves(board, startPosition);
     }
 
     /**
@@ -80,9 +81,75 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        //find the location of the king
-        //
-        return true;
+        int row = 1;
+        int col = 1;
+        int kingRow = 1;
+        int kingCol = 1;
+        boolean kingFound = false;
+        //white case
+        if (teamColor == TeamColor.WHITE){
+            //find location of King
+            while (row < 9) {
+                while (col < 9) {
+                    if (this.board.getPiece(new ChessPosition(row, col)) != null){
+                        if (this.board.getPiece(new ChessPosition(row, col)).getPieceType() == ChessPiece.PieceType.KING) {
+                            kingRow = row;
+                            kingCol = col;
+                            kingFound = true;
+                            break;
+                        }
+                    }
+                    col += 1;
+                }
+                if (kingFound){
+                    break;
+                }
+                col = 1;
+                row += 1;
+            }
+        }
+        if (teamColor == TeamColor.BLACK) {
+            //find location of King
+            row = 8;
+            col = 1;
+            while (row > 0) {
+                while (col < 9) {
+                    if (this.board.getPiece(new ChessPosition(row, col)) != null) {
+                        if (this.board.getPiece(new ChessPosition(row, col)).getPieceType() == ChessPiece.PieceType.KING) {
+                            kingRow = row;
+                            kingCol = col;
+                            break;
+                        }
+                    }
+                    col += 1;
+                }
+                col = 1;
+                row -= 1;
+            }
+        }
+        //reset row and col for final check
+        row = 1;
+        col = 1;
+        while (row < 9){
+            while (col < 9){
+                //check if the King's position is in the possible moves list
+                if (this.board.getPiece(new ChessPosition(row, col)) != null && this.board.getPiece(new ChessPosition(row, col)).getTeamColor() != teamColor){
+                    ChessPiece currPiece = this.board.getPiece(new ChessPosition(row, col));
+                    ArrayList<ChessMove> currPieceMoves = new ArrayList<>();
+                    currPieceMoves.addAll(validMoves(new ChessPosition(row, col)));
+                    for (int i = 0; i < currPieceMoves.size(); i++){
+                        if (currPieceMoves.get(i).getEndPosition().getRow() == kingRow && currPieceMoves.get(i).getEndPosition().getColumn() == kingCol){
+                            return true;
+                        }
+                    }
+                }
+                col += 1;
+            }
+            col = 1;
+            row += 1;
+        }
+        //otherwise
+        return false;
     }
 
     /**
