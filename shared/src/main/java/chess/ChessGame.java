@@ -106,7 +106,9 @@ public class ChessGame {
             board.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), move.getPromotionPiece()));
         }
         //take the move
-        board.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), piece.getPieceType()));
+        else{
+            board.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), piece.getPieceType()));
+       }
         //check if move results in check
         if (isInCheck(team)){
             board = initialBoard;
