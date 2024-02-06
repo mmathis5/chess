@@ -132,8 +132,8 @@ public class ChessGame {
             }
         }
         //reset row and col for final check
-        row = 1;
-        col = 1;
+        row = 7;
+        col = 4;
         while (row < 9){
             while (col < 9){
                 //check if the King's position is in the possible moves list
@@ -163,6 +163,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
+        kingLocations();
         if (!isInCheck(teamColor)){
             return false;
         }
