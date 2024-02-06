@@ -183,7 +183,19 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-
+        //iterate over the whole board and place pieces into my board.
+        int row = 1;
+        int col = 1;
+        while (row < 9){
+            while (col < 9){
+                if (board.getPiece(new ChessPosition(row, col)) != null){
+                    this.board.addPiece(new ChessPosition(row, col), board.getPiece(new ChessPosition(row, col)));
+                }
+            col += 1;
+            }
+            col = 1;
+            row += 1;
+        }
     }
 
     /**
