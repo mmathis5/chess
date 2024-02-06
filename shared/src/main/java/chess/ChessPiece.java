@@ -164,7 +164,7 @@ public class ChessPiece {
             row = myPosition.getRow();
             column = myPosition.getColumn();
             //left
-            while (column < 8 && column > 1) {
+            while (column < 9 && column > 1) {
                 ChessPiece piece = board.getPiece(new ChessPosition(row, column - 1) );
                 if (piece != null && piece.getPieceType() != null) {
                     //checks for enemy piece

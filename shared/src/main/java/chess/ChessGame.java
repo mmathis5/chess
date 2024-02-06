@@ -12,7 +12,7 @@ import java.util.Collection;
  */
 public class ChessGame {
 
-    private TeamColor turn;
+    private TeamColor turn = TeamColor.WHITE;
     private ChessBoard board = new ChessBoard();
     private InvalidMoveException invalidMoveException;
     public ChessGame() {
@@ -83,6 +83,10 @@ public class ChessGame {
         //duplicate board
         ChessBoard initialBoard = duplicateBoard();
         ChessPiece piece = board.getPiece(move.getStartPosition());
+        //confirm that it is their turn
+        if (piece.getTeamColor() != getTeamTurn()){
+            throw new InvalidMoveException();
+        }
         //check if move is invalid because there is no piece there
         if (piece == null){
             throw new InvalidMoveException("there is no piece at the starting location");
@@ -91,22 +95,29 @@ public class ChessGame {
         moves.addAll(this.board.getPiece(move.getStartPosition()).pieceMoves(board, move.getStartPosition()));
         ChessGame.TeamColor team = board.getPiece(move.getStartPosition()).getTeamColor();
         board.removePiece(move.getStartPosition());
-        //promotion case
-        if (piece.getPieceType() == ChessPiece.PieceType.PAWN && move.getPromotionPiece() != null){
+        if (!moves.contains(move)){
+            board = initialBoard;
+            throw new InvalidMoveException();
+        }
+       if (piece.getPieceType() == ChessPiece.PieceType.PAWN && move.getPromotionPiece() != null){
             //The getPromotionPieceMethod return the ChessPiece.PieceType attribute, not the whole piece type.
             //I just made a new piece to fix this, but I don't think that's a very
             //elegant solution. Can I change the expected return type of the function?
             board.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), move.getPromotionPiece()));
         }
-        if (move.getPromotionPiece() == null){
-            board.addPiece(move.getEndPosition(), piece);
-        }
-        if (!moves.contains(move)){
-            throw new InvalidMoveException("You are attempting to make a move that falls outside of the rules of this piece");
-        }
+        //take the move
+        board.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), piece.getPieceType()));
+        //check if move results in check
         if (isInCheck(team)){
             board = initialBoard;
             throw new InvalidMoveException();
+        }
+
+        if (piece.getTeamColor() == TeamColor.WHITE){
+            setTeamTurn(TeamColor.BLACK);
+        }
+        if (piece.getTeamColor() == TeamColor.BLACK){
+            setTeamTurn(TeamColor.WHITE);
         }
     }
 
