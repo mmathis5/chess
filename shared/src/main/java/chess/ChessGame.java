@@ -51,27 +51,25 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         //figure out piece type and color
-//        ChessPiece piece = board.getPiece(startPosition);
-//        ChessGame.TeamColor teamColor = board.getPiece(startPosition).getTeamColor();
-//        //returns the array of possible moves from ChessPiece.java
-//        ArrayList<ChessMove> moves = new ArrayList<>();
-//        ArrayList<ChessMove> potentialMoves = new ArrayList<>();
-//        potentialMoves.addAll(this.board.getPiece(startPosition).pieceMoves(board, startPosition));
-//        for (int i = 0; i < potentialMoves.size(); i++) {
-//            ChessMove move = potentialMoves.get(i);
-//            ChessPosition endPosition = move.getEndPosition();
-//            //duplicate the current game board
-//            ChessBoard unalteredBoard = duplicateBoard();
-//            //make hypothetical move
-//            board.addPiece(endPosition, piece);
-//            if (!isInCheck(teamColor)){
-//                moves.add(potentialMoves.get(i));
-//            }
-//            board = unalteredBoard;
-//        }
-//        return moves;
+        ChessPiece piece = board.getPiece(startPosition);
+        ChessGame.TeamColor teamColor = board.getPiece(startPosition).getTeamColor();
+        //returns the array of possible moves from ChessPiece.java
         ArrayList<ChessMove> moves = new ArrayList<>();
-        moves.addAll(this.board.getPiece(startPosition).pieceMoves(board, startPosition));
+        ArrayList<ChessMove> potentialMoves = new ArrayList<>();
+        potentialMoves.addAll(this.board.getPiece(startPosition).pieceMoves(board, startPosition));
+        for (int i = 0; i < potentialMoves.size(); i++) {
+            ChessMove move = potentialMoves.get(i);
+            ChessPosition endPosition = move.getEndPosition();
+            //duplicate the current game board
+            ChessBoard unalteredBoard = duplicateBoard();
+            //make hypothetical move
+            board.removePiece(startPosition);
+            board.addPiece(endPosition, piece);
+            if (!isInCheck(teamColor)){
+                moves.add(potentialMoves.get(i));
+            }
+            board = unalteredBoard;
+        }
         return moves;
     }
 
@@ -140,9 +138,8 @@ public class ChessGame {
             while (col < 9){
                 //check if the King's position is in the possible moves list
                 if (this.board.getPiece(new ChessPosition(row, col)) != null && this.board.getPiece(new ChessPosition(row, col)).getTeamColor() != teamColor){
-                    ChessPiece currPiece = this.board.getPiece(new ChessPosition(row, col));
                     ArrayList<ChessMove> currPieceMoves = new ArrayList<>();
-                    currPieceMoves.addAll(validMoves(new ChessPosition(row, col)));
+                    currPieceMoves.addAll(board.getPiece(new ChessPosition(row, col)).pieceMoves(board, new ChessPosition(row, col)));
                     for (int i = 0; i < currPieceMoves.size(); i++){
                         if (currPieceMoves.get(i).getEndPosition().getRow() == kingRow && currPieceMoves.get(i).getEndPosition().getColumn() == kingCol){
                             return true;
@@ -176,7 +173,7 @@ public class ChessGame {
             kingRow = kingPosition.getRow();
             kingCol = kingPosition.getColumn();
             ArrayList<ChessMove> blackKingMoves = new ArrayList<>();
-            blackKingMoves.addAll(validMoves(kingPosition));
+            blackKingMoves.addAll(board.getPiece(new ChessPosition(kingRow, kingCol)).pieceMoves(board, new ChessPosition(kingRow, kingCol)));
             for (int i = 0; i < blackKingMoves.size(); i ++){
                 //duplicate the current game board
                 ChessBoard unalteredBoard = duplicateBoard();
@@ -198,7 +195,7 @@ public class ChessGame {
             kingRow = kingPosition.getRow();
             kingCol = kingPosition.getColumn();
             ArrayList<ChessMove> whiteKingMoves = new ArrayList<>();
-            whiteKingMoves.addAll(validMoves(kingPosition));
+            whiteKingMoves.addAll(board.getPiece(new ChessPosition(kingRow, kingCol)).pieceMoves(board, new ChessPosition(kingRow, kingCol)));
             for (int i = 0; i < whiteKingMoves.size(); i ++){
                 //duplicate this.board
                 ChessBoard unalteredBoard = duplicateBoard();
