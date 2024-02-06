@@ -13,10 +13,6 @@ public class ChessGame {
 
     private TeamColor turn;
     private ChessBoard board = new ChessBoard();
-    private int blackKingRow;
-    private int blackKingCol;
-    private int whiteKingRow;
-    private int whiteKingCol;
     public ChessGame() {
     }
 
@@ -89,51 +85,19 @@ public class ChessGame {
         int col = 1;
         int kingRow = 1;
         int kingCol = 1;
-        boolean kingFound = false;
-        //white case
         if (teamColor == TeamColor.WHITE){
-            //find location of King
-            while (row < 9) {
-                while (col < 9) {
-                    if (this.board.getPiece(new ChessPosition(row, col)) != null){
-                        if (this.board.getPiece(new ChessPosition(row, col)).getPieceType() == ChessPiece.PieceType.KING) {
-                            kingRow = row;
-                            kingCol = col;
-                            kingFound = true;
-                            break;
-                        }
-                    }
-                    col += 1;
-                }
-                if (kingFound){
-                    break;
-                }
-                col = 1;
-                row += 1;
-            }
+            ChessPosition king = getWhiteKingLocation();
+            kingRow = king.getRow();
+            kingCol = king.getColumn();
         }
-        if (teamColor == TeamColor.BLACK) {
-            //find location of King
-            row = 8;
-            col = 1;
-            while (row > 0) {
-                while (col < 9) {
-                    if (this.board.getPiece(new ChessPosition(row, col)) != null) {
-                        if (this.board.getPiece(new ChessPosition(row, col)).getPieceType() == ChessPiece.PieceType.KING) {
-                            kingRow = row;
-                            kingCol = col;
-                            break;
-                        }
-                    }
-                    col += 1;
-                }
-                col = 1;
-                row -= 1;
-            }
+        if (teamColor == TeamColor.BLACK){
+            ChessPosition king = getBlackKingLocation();
+            kingRow = king.getRow();
+            kingCol = king.getColumn();
         }
         //reset row and col for final check
-        row = 7;
-        col = 4;
+        row = 1;
+        col = 1;
         while (row < 9){
             while (col < 9){
                 //check if the King's position is in the possible moves list
@@ -163,21 +127,24 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        kingLocations();
         if (!isInCheck(teamColor)){
             return false;
         }
+        int kingRow = 0;
+        int kingCol = 0;
         //black case
         if (teamColor == TeamColor.BLACK){
+            ChessPosition kingPosition = getBlackKingLocation();
+            kingRow = kingPosition.getRow();
+            kingCol = kingPosition.getColumn();
             ArrayList<ChessMove> blackKingMoves = new ArrayList<>();
-            blackKingMoves.addAll(validMoves(new ChessPosition(this.blackKingRow, this.blackKingCol)));
+            blackKingMoves.addAll(validMoves(kingPosition));
             for (int i = 0; i < blackKingMoves.size(); i ++){
                 //duplicate the current game board
                 ChessBoard unalteredBoard = duplicateBoard();
                 //make hypothetical move
-                board.removePiece(new ChessPosition(blackKingRow, blackKingCol));
+                board.removePiece(kingPosition);
                 board.addPiece(blackKingMoves.get(i).getEndPosition(), new ChessPiece(TeamColor.BLACK, ChessPiece.PieceType.KING));
-                Boolean resultsInCheck = false;
                 if (!isInCheck(TeamColor.BLACK)){
                     //reset board to original state
                     board = unalteredBoard;
@@ -187,16 +154,19 @@ public class ChessGame {
                 board = unalteredBoard;
             }
         }
+        //white case
         if (teamColor == TeamColor.WHITE){
+            ChessPosition kingPosition = getWhiteKingLocation();
+            kingRow = kingPosition.getRow();
+            kingCol = kingPosition.getColumn();
             ArrayList<ChessMove> whiteKingMoves = new ArrayList<>();
-            whiteKingMoves.addAll(validMoves(new ChessPosition(this.whiteKingRow, this.whiteKingCol)));
+            whiteKingMoves.addAll(validMoves(kingPosition));
             for (int i = 0; i < whiteKingMoves.size(); i ++){
                 //duplicate this.board
                 ChessBoard unalteredBoard = duplicateBoard();
                 //make hypothetical moves
-                board.removePiece(new ChessPosition(whiteKingRow, whiteKingCol));
-                board.addPiece(whiteKingMoves.get(i).getEndPosition(), new ChessPiece(TeamColor.BLACK, ChessPiece.PieceType.KING));
-                Boolean resultsInCheck = false;
+                board.removePiece(kingPosition);
+                board.addPiece(whiteKingMoves.get(i).getEndPosition(), new ChessPiece(TeamColor.WHITE, ChessPiece.PieceType.KING));
                 if (!isInCheck(TeamColor.WHITE)){
                     //reset board to original state
                     board = unalteredBoard;
@@ -258,40 +228,56 @@ public class ChessGame {
         }
         return duplicateBoard;
     }
-    public void kingLocations(){
+    public ChessPosition getWhiteKingLocation(){
         int row = 1;
         int col = 1;
         int kingRow = 1;
         int kingCol = 1;
-        boolean whiteKingFound = false;
-        boolean blackKingFound = false;
-        //white case
-        while (row < 9) {
+        boolean kingFound = false;
+            //find location of King
+            while (row < 9) {
+                while (col < 9) {
+                    if (this.board.getPiece(new ChessPosition(row, col)) != null && this.board.getPiece(new ChessPosition(row, col)).getTeamColor() == TeamColor.WHITE){
+                        if (this.board.getPiece(new ChessPosition(row, col)).getPieceType() == ChessPiece.PieceType.KING) {
+                            kingRow = row;
+                            kingCol = col;
+                            kingFound = true;
+                            break;
+                        }
+                    }
+                    col += 1;
+                }
+                if (kingFound){
+                    break;
+                }
+                col = 1;
+                row += 1;
+            }
+        return new ChessPosition(kingRow, kingCol);
+    }
+
+    public ChessPosition getBlackKingLocation(){
+        int row = 8;
+        int col = 1;
+        int kingRow = 1;
+        int kingCol = 1;
+        boolean kingFound = false;
+        while (row > 0) {
             while (col < 9) {
-                if (this.board.getPiece(new ChessPosition(row, col)) != null){
+                if (this.board.getPiece(new ChessPosition(row, col)) != null && this.board.getPiece(new ChessPosition(row, col)).getTeamColor() == TeamColor.BLACK) {
                     if (this.board.getPiece(new ChessPosition(row, col)).getPieceType() == ChessPiece.PieceType.KING) {
-                        if (this.board.getPiece(new ChessPosition(row, col)).getTeamColor() == TeamColor.WHITE){
-                            this.whiteKingCol = col;
-                            this.whiteKingRow = row;
-                            whiteKingFound = true;
-                        }
-                        if (this.board.getPiece(new ChessPosition(row, col)).getTeamColor() == TeamColor.BLACK){
-                            this.blackKingCol = col;
-                            this.blackKingRow = row;
-                            blackKingFound = true;
-                        }
+                        kingRow = row;
+                        kingCol = col;
+                        break;
                     }
                 }
                 col += 1;
             }
-            if (blackKingFound && whiteKingFound){
-                break;
-            }
             col = 1;
-            row += 1;
+            row -= 1;
         }
+        return new ChessPosition(kingRow, kingCol);
     }
-
     /**
      * Gets the current chessboard
      *
