@@ -14,7 +14,6 @@ public class ChessGame {
 
     private TeamColor turn = TeamColor.WHITE;
     private ChessBoard board = new ChessBoard();
-    private InvalidMoveException invalidMoveException;
     public ChessGame() {
     }
 
