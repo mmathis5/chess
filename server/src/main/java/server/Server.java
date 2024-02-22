@@ -9,6 +9,12 @@ public class Server {
 
         Spark.staticFiles.location("web");
 
+        Spark.delete("/db", (request, response) -> {
+            response.status(200);
+            //Call the ClearService
+            return "";
+        });
+
         // Register your endpoints and handle exceptions here.
 
         Spark.awaitInitialization();
