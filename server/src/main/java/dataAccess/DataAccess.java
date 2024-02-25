@@ -15,10 +15,11 @@ public interface DataAccess {
     UserData login(String username, String password, String email) throws DataAccessException;
 
     //logout endpoint
-    UserData logout();
+    void logout();
 
     //List Games Endpoint
     //??
+    Collection<GameData> listGames();
 
     //Create Game Endpoint
     GameData createGame(String gameName) throws DataAccessException;
