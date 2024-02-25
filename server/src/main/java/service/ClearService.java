@@ -1,7 +1,10 @@
 package service;
 
-import model.AuthData;
+import model.*;
 
 public class ClearService {
+    public void clear(){
+    //add body
+    }
 }
 
