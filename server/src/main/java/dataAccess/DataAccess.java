@@ -15,10 +15,9 @@ public interface DataAccess {
     UserData login(String username, String password, String email) throws DataAccessException;
 
     //logout endpoint
-    void logout();
+    void logout(AuthData authData);
 
     //List Games Endpoint
-    //??
     Collection<GameData> listGames();
 
     //Create Game Endpoint
