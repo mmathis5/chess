@@ -12,7 +12,7 @@ public interface DataAccess {
     UserData register(String username, String password, String email) throws DataAccessException;
 
     //login endpoint
-    UserData login(String username, String password, String email) throws DataAccessException;
+    AuthData login(String username, String password) throws DataAccessException;
 
     //logout endpoint
     void logout(AuthData authData);
