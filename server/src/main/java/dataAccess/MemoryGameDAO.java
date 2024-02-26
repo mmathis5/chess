@@ -12,17 +12,17 @@ public class MemoryGameDAO implements GameDAO {
     public void clear() {
         gameDataHashMap.clear();
     }
-    public GameData createGame(){
-
-    }
-    public GameData getGame(String gameID){
-
-    }
-    public List<GameData> listGames(){
-
-    }
-    public void updateGame(GameData gameData){
-
-    }
+//    public GameData createGame(){
+//
+//    }
+//    public GameData getGame(String gameID){
+//
+//    }
+//    public List<GameData> listGames(){
+//
+//    }
+//    public void updateGame(GameData gameData){
+//
+//    }
 
 }

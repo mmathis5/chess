@@ -6,18 +6,22 @@ import model.*;
 
 
 public class MemoryUserDAO implements UserDAO{
-    final private HashMap<String, Collection<String>> userDataHashMap = new HashMap<>();
+    final private HashMap<String, UserData> userDataHashMap = new HashMap<>();
 
     public MemoryUserDAO(){}
 
     public void clear(){
         userDataHashMap.clear();
     }
-    public UserData getUser(String username){
-        return
+    public Boolean userExists(String username){
+        //returns true if user exists
+        return this.userDataHashMap.get(username) != null;
     }
-    public void setUser(){
 
-
+    public void addUser(String username, UserData user){
+        userDataHashMap.put(username, user);
+    }
+    public UserData getUser(String username){
+        return userDataHashMap.get(username);
     }
 }
