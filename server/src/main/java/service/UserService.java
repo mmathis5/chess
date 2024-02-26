@@ -3,15 +3,15 @@ import dataAccess.*;
 import model.*;
 
 public class UserService {
-    private final DataAccess dataAccess;
+    private UserDAO userDAO;
 
-    public UserService() {
-        this.dataAccess = new MemoryDataAccess();
+    public UserService(UserDAO userDAO) {
+        this.userDAO = userDAO;
     }
 
-        public AuthData login(UserData.username username, UserData.password password) throws DataAccessException{
-            return dataAccess.login(username, password);
-        }
+//        public AuthData login(UserData.username username, UserData.password password) throws DataAccessException{
+//            return dataAccess.login(username, password);
+//        }
 
     }
 

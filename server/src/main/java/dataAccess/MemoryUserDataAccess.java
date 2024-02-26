@@ -1,20 +1,18 @@
 package dataAccess;
 
 import model.*;
-import service.*;
-import org.eclipse.jetty.server.Authentication;
 
 import java.util.Collection;
 import java.util.HashMap;
 
-public class MemoryDataAccess implements DataAccess{
+public class MemoryUserDataAccess implements DataAccess{
     private int nextAuthToken = 1;
     //authToken should be the key, username the value
     final private HashMap<Integer, AuthData> AuthDataHashMap = new HashMap<>();
     final private HashMap<Integer, GameData> GameDataHashMap = new HashMap<>();
     final private HashMap<String, Collection<String>> UserDataHashMap = new HashMap<>();
 
-    public MemoryDataAccess(){
+    public MemoryUserDataAccess(){
     }
     public void clear(){
         AuthDataHashMap.clear();
