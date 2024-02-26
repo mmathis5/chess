@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import dataAccess.Exceptions.*;
 import spark.*;
@@ -45,25 +46,32 @@ public class Server {
         //register
         Spark.post("/user", (request, response) -> {
             try {
+                //validate that all needed paramaters are present
+                JsonObject jsonObject = new Gson().fromJson(request.body(), JsonObject.class);
+                JsonElement username = jsonObject.get("username");
+                JsonElement password = jsonObject.get("password");
+                JsonElement email = jsonObject.get("email");
+                if (username == null || password == null || email == null){
+                    throw new BadRequestException("you are missing one of the required fields");
+                }
                 UserData user = new Gson().fromJson(request.body(), UserData.class);
 
                 AuthData authData = this.userService.register(user);
                 response.status(200);
                 return new Gson().toJson(authData);
             }
-            catch (UsernameExistsException e){
+            catch (DataAccessException e){
                 response.status(403);
                 return new Gson().toJson(Map.of("message", "Error: already taken"));
             }
-//            catch (BadRequestException e){
-//                response.status(400);
-//                return new Gson().toJson(Map.of("message", "Error: bad request"));
-//            }
-//            catch (FailureException e){
-//                response.status(500);
-//                return new Gson().toJson(Map.of("message", "Error: description"));
-//            }
-        //still need 400 and 500 requests. Idk where they come from
+            catch (BadRequestException e){
+                response.status(400);
+                return new Gson().toJson(Map.of("message", "Error: bad request"));
+            }
+            catch (InternalFailureException e){
+                response.status(500);
+                return new Gson().toJson(Map.of("message", "Error: description"));
+            }
         });
 
         //login
@@ -105,19 +113,19 @@ public class Server {
             }
         });
 
-        //register
-        Spark.post("/game", (request, response) -> {
-            try {
-
-
-                AuthData authData = this.userService.register(user);
-                response.status(200);
-                return new Gson().toJson(authData);
-            }
-            catch (UsernameExistsException e){
-                response.status(403);
-                return new Gson().toJson(Map.of("message", "Error: already taken"));
-            }
+        //New Game
+//        Spark.post("/game", (request, response) -> {
+//            try {
+//
+//
+//                AuthData authData = this.userService.register(user);
+//                response.status(200);
+//                return new Gson().toJson(authData);
+//            }
+//            catch (UsernameExistsException e){
+//                response.status(403);
+//                return new Gson().toJson(Map.of("message", "Error: already taken"));
+//            }
 //            catch (BadRequestException e){
 //                response.status(400);
 //                return new Gson().toJson(Map.of("message", "Error: bad request"));
@@ -127,7 +135,7 @@ public class Server {
 //                return new Gson().toJson(Map.of("message", "Error: description"));
 //            }
             //still need 400 and 500 requests. Idk where they come from
-        });
+//        });
 
 
 

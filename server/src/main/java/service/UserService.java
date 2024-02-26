@@ -17,22 +17,30 @@ public class UserService {
         this.authDAO = authDAO;
     }
 
-    public AuthData register(UserData user) throws DataAccessException, UsernameExistsException {
+    public AuthData register(UserData user) throws DataAccessException, UsernameExistsException, InternalFailureException{
         //check if the username already exists in the database
-        String username = user.getUsername();
-        if (this.userDAO.userExists(username)){
-            throw new UsernameExistsException("this user already exists");
+        try {
+            String username = user.getUsername();
+            if (this.userDAO.userExists(username)) {
+                throw new DataAccessException("this user already exists");
+            }
+            //insert into the hashmap
+            this.userDAO.addUser(username, user);
+            //get the next authToken
+            String authToken = this.authDAO.generateAuthToken();
+            //generate a new AuthData object
+            AuthData authData = new AuthData(authToken, username);
+            //add the AuthData object into the appropriate HashMap
+            this.authDAO.addAuthData(authToken, authData);
+            //return the AuthData object
+            return authData;
         }
-        //insert into the hashmap
-        this.userDAO.addUser(username, user);
-        //get the next authToken
-        String authToken = this.authDAO.generateAuthToken();
-        //generate a new AuthData object
-        AuthData authData = new AuthData(authToken, username);
-        //add the AuthData object into the appropriate HashMap
-        this.authDAO.addAuthData(authToken, authData);
-        //return the AuthData object
-        return authData;
+        catch (DataAccessException e){
+            throw e;
+        }
+        catch (Exception e){
+            throw new InternalFailureException("Something went wrong internally");
+        }
     }
         public AuthData login(String username, String password) throws DataAccessException, InternalFailureException {
             try {
