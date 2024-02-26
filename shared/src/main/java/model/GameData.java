@@ -1,30 +1,41 @@
 package model;
 
-public class GameData {
-    private String gameID = null;
-    private String whiteUsername = null;
+import chess.ChessGame;
 
-    private String blackUsername = null;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
+public class GameData {
+    private Integer gameID;
+    private String whiteUser = null;
+
+    private String blackUser = null;
     private String gameName;
-    // idk how to do this one
-    //    private ChessGame new(ChessGame);
+    private final ChessGame chessGame = new ChessGame();
+    private ArrayList<String> observers = new ArrayList<String>();
 
     //init function
-    public GameData(){
-
-    }
-
-    void setGameID(String id){
-        this.gameID = id;
-    }
-    void setWhiteUsername(String username){
-        this.whiteUsername = username;
-    }
-    void setBlackUsername(String username){
-        this.blackUsername = username;
-    }
-    void setGameName(String gameName){
+    public GameData(String gameName, Integer gameID){
         this.gameName = gameName;
+        this.gameID = gameID;
+
+    }
+
+    public void setWhiteUser(String username){
+        this.whiteUser = username;
+    }
+    public void setBlackUser(String username){
+        this.blackUser = username;
+    }
+
+    public String getBlackUser(){
+        return this.blackUser;
+    }
+    public String getWhiteUser(){
+        return this.whiteUser;
+    }
+    public void addObserver(String username){
+        observers.add(username);
     }
 
 
