@@ -14,9 +14,9 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class Server {
-    private UserService userService;
-    private GameService gameService;
-    private ClearService clearService;
+    private static UserService userService;
+    private static GameService gameService;
+    private static ClearService clearService;
 
     private final UserDAO userDAO = new MemoryUserDAO();
     private final AuthDAO authDAO = new MemoryAuthDAO();
@@ -134,7 +134,7 @@ public class Server {
                 catch(Exception e){
                     throw new BadRequestException("Something is wrong with the request");
                 }
-                //get the authtoken
+                //get the authToken
                 try {
                     String authToken = request.headers("authorization");
                 }
