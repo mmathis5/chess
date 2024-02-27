@@ -1,7 +1,10 @@
 package service;
 
 import dataAccess.*;
+import dataAccess.Exceptions.DataAccessException;
 import model.*;
+
+import javax.xml.crypto.Data;
 
 public class ClearService {
     private UserDAO userDAO;
@@ -12,7 +15,7 @@ public class ClearService {
         this.gameDAO = gameDAO;
         this.authDAO = authDAO;
     }
-    public void clear(){
+    public void clear() {
         userDAO.clear();
         gameDAO.clear();
         authDAO.clear();

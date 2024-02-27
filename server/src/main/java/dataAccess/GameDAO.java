@@ -13,7 +13,7 @@ public interface GameDAO {
     public Integer createGame(String authToken, String gameName)        ;
     public ArrayList<GameData> getGamesList();
     public GameData getGame(Integer gameID);
-//    public List<GameData> listGames();
-//    public void updateGame(GameData gameData);
+
+    public void updateGame(Integer gameID, GameData gameData);
 
 }

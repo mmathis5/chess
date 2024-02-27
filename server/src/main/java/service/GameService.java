@@ -49,6 +49,9 @@ public class GameService {
             //get the games associated with the authToken
             return this.gameDAO.getGamesList();
         }
+        catch(DataAccessException e){
+            throw e;
+        }
         catch(Exception e){
             throw new InternalFailureException("Something went wrong internally");
         }
@@ -81,6 +84,8 @@ public class GameService {
             if (playerColor == null){
                 game.addObserver(username);
             }
+            //update the game in the hashMap
+            this.gameDAO.updateGame(gameID, game);
         }
         catch (DataAccessException e){
             throw e;

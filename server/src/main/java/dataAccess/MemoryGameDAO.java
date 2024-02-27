@@ -34,7 +34,9 @@ public class MemoryGameDAO implements GameDAO {
     }
     public GameData getGame(Integer gameID){return gameDataHashMap.get(gameID);}
 
-//    public void updateGame(GameData gameData){
+    public void updateGame(Integer gameID, GameData game){
+        this.gameDataHashMap.put(gameID, game);
+    }
 //
 //    }
 

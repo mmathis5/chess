@@ -35,9 +35,20 @@ public class Server {
         //clear
         Spark.delete("/db", (request, response) -> {
             try {
+                //validate that the AuthToken is legal
+                try{
+                    String authToken = request.headers("authorization");
+                }
+                catch(Exception e){
+                    throw new DataAccessException("something is wrong with the authorization");
+                }
                 this.clearService.clear();
                 response.status(200);
                 return new Gson().toJson(Map.of("message", "deleted"));
+            }
+            catch (DataAccessException e){
+                response.status(401);
+                throw e;
             }
             catch (Exception e){
                 response.status(500);

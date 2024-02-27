@@ -7,9 +7,9 @@ import java.util.ArrayList;
 
 public class GameData {
     private Integer gameID;
-    private String whiteUser = null;
+    private String whiteUser;
 
-    private String blackUser = null;
+    private String blackUser;
     private String gameName;
     private final ChessGame chessGame = new ChessGame();
     private ArrayList<String> observers = new ArrayList<String>();
