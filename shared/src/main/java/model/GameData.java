@@ -7,9 +7,9 @@ import java.util.ArrayList;
 
 public class GameData {
     private Integer gameID;
-    private String whiteUser;
+    private String whiteUsername;
 
-    private String blackUser;
+    private String blackUsername;
     private String gameName;
     private final ChessGame chessGame = new ChessGame();
     private ArrayList<String> observers = new ArrayList<String>();
@@ -22,17 +22,17 @@ public class GameData {
     }
 
     public void setWhiteUser(String username){
-        this.whiteUser = username;
+        this.whiteUsername = username;
     }
     public void setBlackUser(String username){
-        this.blackUser = username;
+        this.blackUsername = username;
     }
 
     public String getBlackUser(){
-        return this.blackUser;
+        return this.blackUsername;
     }
     public String getWhiteUser(){
-        return this.whiteUser;
+        return this.whiteUsername;
     }
     public void addObserver(String username){
         observers.add(username);
