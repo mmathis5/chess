@@ -7,8 +7,5 @@ public class AuthData {
         this.authToken = authToken;
         this.username = username;
     }
-    public String getAuthToken(){
-        return this.authToken;
-    }
     public String getUsername(){return this.username;}
 }
