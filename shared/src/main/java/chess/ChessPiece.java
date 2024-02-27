@@ -211,6 +211,23 @@ public class ChessPiece {
         }
         return moves;
     }
+
+    public ArrayList<ChessMove> cleanMovesArray(ChessBoard board, ChessPosition myPosition, ArrayList<ChessMove> possibleMoves){
+        ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
+        for (int i = 0; i < possibleMoves.size() ; i ++){
+            ChessPosition possibleMove = possibleMoves.get(i).getEndPosition();
+            ChessPiece piece = board.getPiece(possibleMove);
+            if (piece == null){
+                moves.add(new ChessMove(myPosition, possibleMove, null));
+            }
+            else{
+                if (piece.getTeamColor() != this.getTeamColor()){
+                    moves.add(new ChessMove(myPosition, possibleMove, null));
+                }
+            }
+        }
+        return moves;
+    }
     public ArrayList<ChessMove> knightMove(ChessBoard board, ChessPosition myPosition){
         ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
         int row = myPosition.getRow();
@@ -248,19 +265,7 @@ public class ChessPiece {
         if (row + 2 < 9 && column -1 > 0) {
             possibleMoves.add(new ChessMove(myPosition, new ChessPosition(row + 2, column - 1), null));
         }
-        for (int i = 0; i < possibleMoves.size() ; i ++){
-            ChessPosition possibleMove = possibleMoves.get(i).getEndPosition();
-            ChessPiece piece = board.getPiece(possibleMove);
-            if (piece == null){
-                moves.add(new ChessMove(myPosition, possibleMove, null));
-            }
-            else{
-                if (piece.getTeamColor() != this.getTeamColor()){
-                    moves.add(new ChessMove(myPosition, possibleMove, null));
-                }
-            }
-        }
-        return moves;
+        return cleanMovesArray(board, myPosition, possibleMoves);
     }
     public ArrayList<ChessMove> kingMove(ChessBoard board, ChessPosition myPosition){
         ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
@@ -299,20 +304,7 @@ public class ChessPiece {
         if (row < 8 && column > 1) {
             possibleMoves.add(new ChessMove(myPosition, new ChessPosition(row + 1, column -1), null));
         }
-
-        for (int i = 0; i < possibleMoves.size() ; i ++){
-            ChessPosition possibleMove = possibleMoves.get(i).getEndPosition();
-            ChessPiece piece = board.getPiece(possibleMove);
-            if (piece == null){
-                moves.add(new ChessMove(myPosition, possibleMove, null));
-            }
-            else{
-                if (piece.getTeamColor() != this.getTeamColor()){
-                    moves.add(new ChessMove(myPosition, possibleMove, null));
-                }
-            }
-        }
-        return moves;
+        return cleanMovesArray(board, myPosition, possibleMoves);
     }
     public ArrayList<ChessMove> pawnMove(ChessBoard board, ChessPosition myPosition){
         ArrayList<ChessMove> moves = new ArrayList<ChessMove>();

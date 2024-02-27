@@ -27,12 +27,8 @@ public class Server {
         this.gameService = new GameService(gameDAO, authDAO);
         this.clearService = new ClearService(userDAO, gameDAO, authDAO);
     }
-    public int run(int desiredPort) {
-        Spark.port(desiredPort);
 
-        Spark.staticFiles.location("web");
-
-        //clear
+    private void clearEndpoint(){
         Spark.delete("/db", (request, response) -> {
             try {
                 //validate that the AuthToken is legal
@@ -54,9 +50,9 @@ public class Server {
                 response.status(500);
                 return new Gson().toJson(Map.of("message", "Error: description"));
             }
-            });
-
-        //register
+        });
+    }
+    private void registerEndpoint(){
         Spark.post("/user", (request, response) -> {
             try {
                 //validate that all needed parameters are present
@@ -86,8 +82,9 @@ public class Server {
                 return new Gson().toJson(Map.of("message", "Error: description"));
             }
         });
+    }
 
-        //login
+    public void loginEndpoint(){
         Spark.post("/session", (request, response) -> {
             try {
                 //get the username and password;
@@ -107,8 +104,9 @@ public class Server {
                 return new Gson().toJson(Map.of("message", "Error: description"));
             }
         });
+    }
 
-        //logout
+    public void logoutEndpoint(){
         Spark.delete("/session", (request, response) -> {
             try {
                 String authToken = request.headers("authorization");
@@ -125,8 +123,9 @@ public class Server {
                 return new Gson().toJson(Map.of("message", "Error: description"));
             }
         });
+    }
 
-        //New Game
+    private void newGameEndpoint(){
         Spark.post("/game", (request, response) -> {
             try {
                 try {
@@ -166,8 +165,8 @@ public class Server {
                 return new Gson().toJson(Map.of("message", "Error: description"));
             }
         });
-
-        //listGames endpoint
+    }
+    private void listGameEndpoint(){
         Spark.get("/game", (request, response) -> {
             try {
                 String authToken = request.headers("authorization");
@@ -183,8 +182,9 @@ public class Server {
                 return new Gson().toJson(Map.of("message", "Error: description"));
             }
         });
+    }
 
-        //JoinGame
+    private void joinGameEndpoint(){
         Spark.put("/game", (request, response) -> {
             try {
                 JsonObject jsonObject = new Gson().fromJson(request.body(), JsonObject.class);
@@ -228,10 +228,18 @@ public class Server {
             }
         });
 
+    }
+    public int run(int desiredPort) {
+        Spark.port(desiredPort);
+        Spark.staticFiles.location("web");
 
-
-        // Register your endpoints and handle exceptions here.
-
+        clearEndpoint();
+        registerEndpoint();
+        loginEndpoint();
+        logoutEndpoint();
+        newGameEndpoint();
+        listGameEndpoint();
+        joinGameEndpoint();
 
         Spark.awaitInitialization();
         return Spark.port();
