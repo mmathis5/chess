@@ -63,6 +63,10 @@ public class GameService {
             if (this.authDAO.getAuth(authToken) == null) {
                 throw new DataAccessException("this authToken isn't valid");
             }
+            //validate that the game exists
+            if (this.gameDAO.getGame(gameID) == null){
+                throw new BadRequestException("this game ID is bad");
+            }
             //gets username
             String username = this.authDAO.getAuth(authToken).getUsername();
             //get game
@@ -91,6 +95,9 @@ public class GameService {
             throw e;
         }
         catch (JoinGameColorException e){
+            throw e;
+        }
+        catch (BadRequestException e){
             throw e;
         }
         catch (Exception e){

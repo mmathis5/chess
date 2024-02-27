@@ -144,6 +144,10 @@ public class Server {
                 }
                 JsonObject jsonObject = new Gson().fromJson(request.body(), JsonObject.class);
                 String authToken = request.headers("authorization");
+                JsonElement gameNameJsonElement = jsonObject.get("gameName");
+                if (gameNameJsonElement == null){
+                    throw new BadRequestException("Game name not provided");
+                }
                 String gameName =  jsonObject.get("gameName").getAsString();
                 Integer gameID = this.gameService.createGame(authToken, gameName);
                 response.status(200);
@@ -192,10 +196,18 @@ public class Server {
                     throw new BadRequestException("something is wrong with the request");
                 }
                 String authToken = request.headers("authorization");
-                String playerColor = jsonObject.get("playerColor").getAsString();
+                try {
+                    //case where playerColor is provided
+                    String playerColor = jsonObject.get("playerColor").getAsString();
+                    Integer gameID = jsonObject.get("gameID").getAsInt();
+                    this.gameService.joinGame(gameID, playerColor, authToken);
+                }
+                catch (NullPointerException e){
+                    //case where playerColor is not provided
+                    Integer gameID = jsonObject.get("gameID").getAsInt();
+                    this.gameService.joinGame(gameID, null, authToken);
+                }
                 Integer gameID = jsonObject.get("gameID").getAsInt();
-                this.gameService.joinGame(gameID, playerColor, authToken);
-
                 return new Gson().toJson(Map.of("gameID", gameID));
             }
             catch (BadRequestException e){
