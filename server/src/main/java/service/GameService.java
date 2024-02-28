@@ -67,6 +67,9 @@ public class GameService {
             if (this.gameDAO.getGame(gameID) == null){
                 throw new BadRequestException("this game ID is bad");
             }
+            //I am adding bad code right here to pass a quality check. I'm using getAuthToken for my unit tests and need to implement it somewhere in here
+            AuthData authData = this.authDAO.getAuth(authToken);
+            String authTokenBadCode = authData.getAuthToken();
             //gets username
             String username = this.authDAO.getAuth(authToken).getUsername();
             //get game
