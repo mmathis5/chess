@@ -1,16 +1,12 @@
 package serviceTest;
 
-import com.google.protobuf.Internal;
-import dataAccess.Exceptions.*;
+import dataAccess.exceptions.*;
 import dataAccess.*;
-import org.eclipse.jetty.server.Authentication;
 import org.junit.jupiter.api.*;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
 import model.*;
-
-import javax.xml.crypto.Data;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 

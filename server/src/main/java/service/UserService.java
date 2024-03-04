@@ -1,11 +1,10 @@
 package service;
 import dataAccess.*;
-import dataAccess.Exceptions.DataAccessException;
-import dataAccess.Exceptions.InternalFailureException;
-import dataAccess.Exceptions.UsernameExistsException;
+import dataAccess.exceptions.DataAccessException;
+import dataAccess.exceptions.InternalFailureException;
+import dataAccess.exceptions.UsernameExistsException;
 import model.*;
 
-import javax.xml.crypto.Data;
 import java.util.Objects;
 
 public class UserService {

@@ -1,4 +1,4 @@
-package dataAccess.Exceptions;
+package dataAccess.exceptions;
 
 /**
  * Indicates that something went wrong internally.

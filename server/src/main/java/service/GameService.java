@@ -1,17 +1,14 @@
 package service;
 
-import chess.ChessGame;
 import dataAccess.AuthDAO;
-import dataAccess.Exceptions.BadRequestException;
-import dataAccess.Exceptions.DataAccessException;
-import dataAccess.Exceptions.InternalFailureException;
-import dataAccess.Exceptions.JoinGameColorException;
+import dataAccess.exceptions.BadRequestException;
+import dataAccess.exceptions.DataAccessException;
+import dataAccess.exceptions.InternalFailureException;
+import dataAccess.exceptions.JoinGameColorException;
 import dataAccess.GameDAO;
 import model.*;
 
-import javax.xml.crypto.Data;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Objects;
 
 public class GameService {

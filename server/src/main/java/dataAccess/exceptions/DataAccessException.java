@@ -1,4 +1,4 @@
-package dataAccess.Exceptions;
+package dataAccess.exceptions;
 
 /**
  * Indicates there was an error connecting to the database

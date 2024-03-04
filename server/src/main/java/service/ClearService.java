@@ -1,10 +1,6 @@
 package service;
 
 import dataAccess.*;
-import dataAccess.Exceptions.DataAccessException;
-import model.*;
-
-import javax.xml.crypto.Data;
 
 public class ClearService {
     private UserDAO userDAO;
