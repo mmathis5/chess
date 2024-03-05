@@ -5,6 +5,7 @@ import model.GameData;
 import java.util.ArrayList;
 
 public class DBGame {
+    public DBGame(){}
     public void clear(){
 
     }

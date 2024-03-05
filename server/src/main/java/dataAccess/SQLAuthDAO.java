@@ -3,6 +3,7 @@ package dataAccess;
 import model.AuthData;
 
 public class DBAuth implements AuthDAO {
+    public DBAuth(){}
     public void clear(){
 
     }

@@ -3,6 +3,7 @@ package dataAccess;
 import model.UserData;
 
 public class DBUser {
+    public DBUser(){}
     public void clear(){
 
     }
