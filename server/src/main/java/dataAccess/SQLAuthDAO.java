@@ -15,13 +15,20 @@ public class SQLAuthDAO implements AuthDAO {
     public SQLAuthDAO() {
         // Initialize the database connection
         try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/your_database_name", "username", "password");
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/chess", "root", "password");
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
     public void clear(){
-
+        try{
+            PreparedStatement statement = connection.prepareStatement("TRUNCATE auth_table";
+            statement.executeUpdate();
+            // Close the statement
+            statement.close();
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
     }
     public String generateAuthToken(){
         String authToken = String.valueOf(nextAuthToken);
@@ -47,10 +54,22 @@ public class SQLAuthDAO implements AuthDAO {
         }
     }
     public AuthData getAuth(String authToken){
-
+        try{
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM auth_table WHERE authToken=?");
+            statement.setString(1, authToken);
+            statement.executeUpdate();
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
     }
 
     public void deleteAuth(String authToken){
-
+        try{
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM auth_table WHERE authToken=?");
+            statement.setString(1, authToken);
+            statement.executeUpdate();
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
     }
 }
