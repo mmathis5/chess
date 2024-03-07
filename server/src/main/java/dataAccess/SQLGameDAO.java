@@ -17,7 +17,13 @@ public class SQLGameDAO implements GameDAO{
         }
     }
     public void clear(){
-
+        try{
+            PreparedStatement statement = connection.prepareStatement("TRUNCATE gameTable");
+            statement.executeUpdate();
+            statement.close();
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
     }
     public Integer createGame(String authToken, String gameName){
 

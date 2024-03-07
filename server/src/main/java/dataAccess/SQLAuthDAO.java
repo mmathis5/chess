@@ -22,7 +22,7 @@ public class SQLAuthDAO implements AuthDAO {
     }
     public void clear(){
         try{
-            PreparedStatement statement = connection.prepareStatement("TRUNCATE auth_table");
+            PreparedStatement statement = connection.prepareStatement("TRUNCATE authTable");
             statement.executeUpdate();
             statement.close();
         } catch (SQLException e){
@@ -37,7 +37,7 @@ public class SQLAuthDAO implements AuthDAO {
     public void addAuthData(String authToken, AuthData authData){
         try {
             // Create a PreparedStatement with the INSERT statement
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO auth_table (auth_token, username) VALUES (?, ?)");
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO authTable (authToken, username) VALUES (?, ?)");
 
             // Set values for the placeholders in the SQL statement
             statement.setString(1, authToken);
@@ -54,7 +54,7 @@ public class SQLAuthDAO implements AuthDAO {
     }
     public AuthData getAuth(String authToken){
         try{
-            PreparedStatement statement = connection.prepareStatement("GET FROM auth_table WHERE authToken=?");
+            PreparedStatement statement = connection.prepareStatement("GET FROM authTable WHERE authToken=?");
             statement.setString(1, authToken);
             statement.executeUpdate();
         } catch (SQLException e){
@@ -65,7 +65,7 @@ public class SQLAuthDAO implements AuthDAO {
 
     public void deleteAuth(String authToken){
         try{
-            PreparedStatement statement = connection.prepareStatement("DELETE FROM auth_table WHERE authToken=?");
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM authTable WHERE authToken=?");
             statement.setString(1, authToken);
             statement.executeUpdate();
         } catch (SQLException e){
