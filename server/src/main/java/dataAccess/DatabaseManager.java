@@ -43,9 +43,6 @@ public class DatabaseManager {
             var conn = DriverManager.getConnection(connectionUrl, user, password);
 
             try (var preparedStatement = conn.prepareStatement(statement)) {
-                createUserTable(conn);
-                createAuthTable(conn);
-                createGameTable(conn);
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
@@ -75,11 +72,11 @@ public class DatabaseManager {
 
     static void createGameTable(Connection conn) throws SQLException {
         String createUserTableSQL = "CREATE TABLE IF NOT EXISTS gameTable (" +
-                "gameID INT PRIMARY KEY," +
+                "gameName VARCHAR(100)," +
+                "gameID INT," +
                 "whiteUsername VARCHAR(100)," +
                 "blackUsername VARCHAR(100)," +
-                "gameName VARCHAR(100)," +
-                "game TEXT" +
+                "game BLOB" +
                 ")";
         try (var preparedStatement = conn.prepareStatement(createUserTableSQL)) {
             preparedStatement.executeUpdate();

@@ -1,6 +1,8 @@
 package dataAccess;
 
+import dataAccess.exceptions.DataAccessException;
 import model.AuthData;
+import model.UserData;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -16,8 +18,12 @@ public class SQLAuthDAO implements AuthDAO {
         // Initialize the database connection
         try {
             connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/chess", "root", "password");
+            DatabaseManager.createDatabase();
+            DatabaseManager.createAuthTable(connection);
         } catch (SQLException e) {
             e.printStackTrace();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
         }
     }
     public void clear(){
@@ -52,15 +58,12 @@ public class SQLAuthDAO implements AuthDAO {
             e.printStackTrace();
         }
     }
-    public AuthData getAuth(String authToken){
-        try{
-            PreparedStatement statement = connection.prepareStatement("GET FROM authTable WHERE authToken=?");
-            statement.setString(1, authToken);
-            statement.executeUpdate();
-        } catch (SQLException e){
-            e.printStackTrace();
-        }
-        //idk how this will work with retrieving the info and then making it of type authData
+    public AuthData getAuth(String authToken) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM authTable WHERE authToken=?");
+        statement.setString(1, authToken);
+        ResultSet resultSet = statement.executeQuery();
+        String username = resultSet.getString("username");
+        return new AuthData(authToken, username);
     }
 
     public void deleteAuth(String authToken){

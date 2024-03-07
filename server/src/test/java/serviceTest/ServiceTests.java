@@ -8,6 +8,9 @@ import service.GameService;
 import service.UserService;
 import model.*;
 
+import java.io.IOException;
+import java.sql.SQLException;
+
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -175,7 +178,7 @@ class ServiceTests {
   @Order(15)
   @Test
   @DisplayName("Successful Clear")
-  public void successClearApplication() throws DataAccessException, UsernameExistsException, InternalFailureException{
+  public void successClearApplication() throws DataAccessException, UsernameExistsException, InternalFailureException, SQLException, IOException, ClassNotFoundException {
     UserData user = new UserData("Maddie1", "1", "a@gmail.com");
     userService.register(user);
     AuthData authData = userService.login("Maddie1", "1");

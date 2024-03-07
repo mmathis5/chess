@@ -1,5 +1,6 @@
 package dataAccess;
 
+import dataAccess.exceptions.DataAccessException;
 import model.UserData;
 import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -12,9 +13,13 @@ public class SQLUserDAO implements UserDAO{
     private Connection connection;
     public SQLUserDAO(){try {
         connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/your_database_name", "username", "password");
-      } catch (SQLException e) {
+        DatabaseManager.createDatabase();
+        DatabaseManager.createGameTable(connection);
+    } catch (SQLException e) {
             e.printStackTrace();
-        }
+        } catch (DataAccessException e) {
+        throw new RuntimeException(e);
+    }
     }
     public void clear(){
         try{

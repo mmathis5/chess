@@ -19,7 +19,7 @@ public class MemoryGameDAO implements GameDAO {
         nextGameID ++;
         //create new GameData instance
         GameData newGame = new GameData(gameName, gameID);
-        //add it to the hashMap using the authToken as the key
+        //add it to the hashMap using the gameName as the key
         gameDataHashMap.put(gameID, newGame);
         return gameID;
     }
