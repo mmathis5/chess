@@ -22,9 +22,8 @@ public class SQLAuthDAO implements AuthDAO {
     }
     public void clear(){
         try{
-            PreparedStatement statement = connection.prepareStatement("TRUNCATE auth_table";
+            PreparedStatement statement = connection.prepareStatement("TRUNCATE auth_table");
             statement.executeUpdate();
-            // Close the statement
             statement.close();
         } catch (SQLException e){
             e.printStackTrace();
@@ -55,12 +54,13 @@ public class SQLAuthDAO implements AuthDAO {
     }
     public AuthData getAuth(String authToken){
         try{
-            PreparedStatement statement = connection.prepareStatement("DELETE FROM auth_table WHERE authToken=?");
+            PreparedStatement statement = connection.prepareStatement("GET FROM auth_table WHERE authToken=?");
             statement.setString(1, authToken);
             statement.executeUpdate();
         } catch (SQLException e){
             e.printStackTrace();
         }
+        //idk how this will work with retrieving the info and then making it of type authData
     }
 
     public void deleteAuth(String authToken){

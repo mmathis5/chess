@@ -16,4 +16,5 @@ public class UserData {
     public String getPassword() {
         return password;
     }
+    public String getEmail(){ return email;}
 }
