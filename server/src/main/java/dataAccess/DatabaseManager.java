@@ -39,8 +39,13 @@ public class DatabaseManager {
     static void createDatabase() throws DataAccessException {
         try {
             var statement = "CREATE DATABASE IF NOT EXISTS " + databaseName;
+
             var conn = DriverManager.getConnection(connectionUrl, user, password);
+
             try (var preparedStatement = conn.prepareStatement(statement)) {
+                createUserTable(conn);
+                createAuthTable(conn);
+                createGameTable(conn);
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
@@ -48,6 +53,38 @@ public class DatabaseManager {
         }
     }
 
+    static void createUserTable(Connection conn) throws SQLException {
+        String createUserTableSQL = "CREATE TABLE IF NOT EXISTS userTable (" +
+                "username VARCHAR(100) PRIMARY KEY," +
+                "password VARCHAR(100) NOT NULL," +
+                "email VARCHAR(100)" +
+                ")";
+        try (var preparedStatement = conn.prepareStatement(createUserTableSQL)) {
+            preparedStatement.executeUpdate();
+        }
+    }
+    static void createAuthTable(Connection conn) throws SQLException {
+        String createUserTableSQL = "CREATE TABLE IF NOT EXISTS authTable (" +
+                "authToken VARCHAR(100) PRIMARY KEY," +
+                "username VARCHAR(100) NOT NULL" +
+                ")";
+        try (var preparedStatement = conn.prepareStatement(createUserTableSQL)) {
+            preparedStatement.executeUpdate();
+        }
+    }
+
+    static void createGameTable(Connection conn) throws SQLException {
+        String createUserTableSQL = "CREATE TABLE IF NOT EXISTS gameTable (" +
+                "gameID INT PRIMARY KEY," +
+                "whiteUsername VARCHAR(100)," +
+                "blackUsername VARCHAR(100)," +
+                "gameName VARCHAR(100)," +
+                "game TEXT" +
+                ")";
+        try (var preparedStatement = conn.prepareStatement(createUserTableSQL)) {
+            preparedStatement.executeUpdate();
+        }
+    }
     /**
      * Create a connection to the database and sets the catalog based upon the
      * properties specified in db.properties. Connections to the database should

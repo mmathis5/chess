@@ -1,9 +1,11 @@
 package dataAccess;
 
 import model.UserData;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.sql.*;
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 
 public class SQLUserDAO implements UserDAO{
@@ -19,16 +21,19 @@ public class SQLUserDAO implements UserDAO{
             PreparedStatement statement = connection.prepareStatement("TRUNCATE userTable");
             statement.executeUpdate();
             statement.close();
+
         } catch (SQLException e){
             e.printStackTrace();
         }
     }
 
     public Boolean userExists(String username){
-        if (getUser(username) != SQLException){
-            return true;
+        try{
+            UserData user = getUser(username);
+            return user != null;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        return false;
     }
     public void addUser(String username, UserData user){
         try {
@@ -45,14 +50,12 @@ public class SQLUserDAO implements UserDAO{
             e.printStackTrace();
         }
     }
-    public UserData getUser(String username){
-        try{
-            PreparedStatement statement = connection.prepareStatement("GET FROM userTable WHERE username=?");
-            statement.setString(1, username);
-            statement.execute();
-        } catch (SQLException e){
-            e.printStackTrace();
-        }
-        //idk how to return this
+    public UserData getUser(String username) throws SQLException{
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM userTable WHERE username=?");
+        statement.setString(1, username);
+        ResultSet resultSet = statement.executeQuery();
+        String hashedPassword = resultSet.getString("password");
+        String email = resultSet.getString("email");
+        return new UserData(username, hashedPassword, email);
     }
 }
