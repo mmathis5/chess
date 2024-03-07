@@ -9,6 +9,7 @@ import service.*;
 import dataAccess.*;
 import model.*;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -21,7 +22,7 @@ public class Server {
     private final AuthDAO authDAO = new SQLAuthDAO();
     private final GameDAO gameDAO = new SQLGameDAO();
 
-    public Server(){
+    public Server() throws SQLException, DataAccessException {
         this.userService = new UserService(userDAO, authDAO);
         this.gameService = new GameService(gameDAO, authDAO);
         this.clearService = new ClearService(userDAO, gameDAO, authDAO);
@@ -249,7 +250,7 @@ public class Server {
         Spark.awaitStop();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException, DataAccessException {
         Server server = new Server();
         server.run(8080);
     }

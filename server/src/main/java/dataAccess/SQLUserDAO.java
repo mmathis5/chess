@@ -11,15 +11,8 @@ import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 public class SQLUserDAO implements UserDAO{
     private Connection connection;
-    public SQLUserDAO(){try {
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/your_database_name", "username", "password");
-        DatabaseManager.createDatabase();
-        DatabaseManager.createGameTable(connection);
-    } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (DataAccessException e) {
-        throw new RuntimeException(e);
-    }
+    public SQLUserDAO() throws DataAccessException {
+        configureDatabase();
     }
     public void clear(){
         try{
@@ -63,4 +56,29 @@ public class SQLUserDAO implements UserDAO{
         String email = resultSet.getString("email");
         return new UserData(username, hashedPassword, email);
     }
+
+    private final String[] createStatements = {
+            """
+            CREATE TABLE IF NOT EXISTS  pet (
+              `username` VARCHAR(100),
+              `password` VARCHAR(100),
+              'email' VARCHAR(100)
+              )
+            """
+    };
+
+
+    private void configureDatabase() throws DataAccessException {
+        DatabaseManager.createDatabase();
+        try (var conn = DatabaseManager.getConnection()) {
+            for (var statement : createStatements) {
+                try (var preparedStatement = conn.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
+        }
+    }
+
 }
