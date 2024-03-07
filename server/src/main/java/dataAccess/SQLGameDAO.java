@@ -15,20 +15,12 @@ import java.sql.SQLException;
 public class SQLGameDAO implements GameDAO{
     private Connection connection;
     private int nextGameID = 1;
-    public SQLGameDAO(){// Initialize the database connection
-        try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/your_database_name", "username", "password");
-            DatabaseManager.createDatabase();
-            DatabaseManager.createGameTable(connection);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
+    public SQLGameDAO() throws DataAccessException {// Initialize the database connection
+        configureDatabase();
     }
     public void clear(){
         try{
-            PreparedStatement statement = connection.prepareStatement("TRUNCATE gameTable");
+            PreparedStatement statement = connection.prepareStatement("DROP table gameTable");
             statement.executeUpdate();
             statement.close();
         } catch (SQLException e){
@@ -111,6 +103,15 @@ public class SQLGameDAO implements GameDAO{
     } catch (SQLException | IOException e) {
         e.printStackTrace();
     }
-}
+    }
+
+    private void configureDatabase() throws DataAccessException {
+        DatabaseManager.createDatabase();
+        try (var conn = DatabaseManager.getConnection()) {
+            DatabaseManager.createGameTable(conn);
+        } catch (SQLException ex) {
+            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
+        }
+    }
 
 }

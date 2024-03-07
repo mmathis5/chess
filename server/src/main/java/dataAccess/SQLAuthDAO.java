@@ -14,21 +14,12 @@ public class SQLAuthDAO implements AuthDAO {
     private Connection connection;
     private int nextAuthToken = 1;
 
-    public SQLAuthDAO() {
-        // Initialize the database connection
-        try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/chess", "root", "password");
-            DatabaseManager.createDatabase();
-            DatabaseManager.createAuthTable(connection);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
+    public SQLAuthDAO() throws DataAccessException {
+        configureDatabase();
     }
     public void clear(){
         try{
-            PreparedStatement statement = connection.prepareStatement("TRUNCATE authTable");
+            PreparedStatement statement = connection.prepareStatement("DROP table authTable");
             statement.executeUpdate();
             statement.close();
         } catch (SQLException e){
@@ -73,6 +64,15 @@ public class SQLAuthDAO implements AuthDAO {
             statement.executeUpdate();
         } catch (SQLException e){
             e.printStackTrace();
+        }
+    }
+
+    private void configureDatabase() throws DataAccessException {
+        DatabaseManager.createDatabase();
+        try (var conn = DatabaseManager.getConnection()) {
+            DatabaseManager.createAuthTable(conn);
+        } catch (SQLException ex) {
+            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
         }
     }
 }

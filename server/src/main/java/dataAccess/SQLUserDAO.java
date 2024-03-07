@@ -16,7 +16,7 @@ public class SQLUserDAO implements UserDAO{
     }
     public void clear(){
         try{
-            PreparedStatement statement = connection.prepareStatement("TRUNCATE userTable");
+            PreparedStatement statement = connection.prepareStatement("DROP table userTable");
             statement.executeUpdate();
             statement.close();
 
@@ -57,25 +57,10 @@ public class SQLUserDAO implements UserDAO{
         return new UserData(username, hashedPassword, email);
     }
 
-    private final String[] createStatements = {
-            """
-            CREATE TABLE IF NOT EXISTS  pet (
-              `username` VARCHAR(100),
-              `password` VARCHAR(100),
-              'email' VARCHAR(100)
-              )
-            """
-    };
-
-
     private void configureDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();
         try (var conn = DatabaseManager.getConnection()) {
-            for (var statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
+            DatabaseManager.createUserTable(conn);
         } catch (SQLException ex) {
             throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
         }
