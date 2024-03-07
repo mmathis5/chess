@@ -2,10 +2,20 @@ package dataAccess;
 
 import model.GameData;
 
+import java.sql.*;
 import java.util.ArrayList;
+import java.sql.SQLException;
+
 
 public class SQLGameDAO implements GameDAO{
-    public SQLGameDAO(){}
+    private Connection connection;
+    public SQLGameDAO(){// Initialize the database connection
+        try {
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/your_database_name", "username", "password");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
     public void clear(){
 
     }

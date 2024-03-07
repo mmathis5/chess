@@ -29,7 +29,22 @@ public class SQLAuthDAO implements AuthDAO {
         return authToken;
     }
     public void addAuthData(String authToken, AuthData authData){
+        try {
+            // Create a PreparedStatement with the INSERT statement
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO auth_table (auth_token, username) VALUES (?, ?)");
 
+            // Set values for the placeholders in the SQL statement
+            statement.setString(1, authToken);
+            statement.setString(2, authData.getUsername());
+
+            // Execute the INSERT statement
+            statement.executeUpdate();
+
+            // Close the statement
+            statement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
     public AuthData getAuth(String authToken){
 
