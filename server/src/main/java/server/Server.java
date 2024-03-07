@@ -17,12 +17,9 @@ public class Server {
     private static GameService gameService;
     private static ClearService clearService;
 
-    private final UserDAO userDAO = new MemoryUserDAO();
-    private final DBUser userDB = new DBUser();
-    private final AuthDAO authDAO = new MemoryAuthDAO();
-    private final DBAuth authDB = new DBAuth();
-    private final GameDAO gameDAO = new MemoryGameDAO();
-    private final DBGame gameDB = new DBGame();
+    private final UserDAO userDAO = new SQLUserDAO();
+    private final AuthDAO authDAO = new SQLAuthDAO();
+    private final GameDAO gameDAO = new SQLGameDAO();
 
     public Server(){
         this.userService = new UserService(userDAO, authDAO);

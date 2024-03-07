@@ -2,8 +2,8 @@ package dataAccess;
 
 import model.UserData;
 
-public class DBUser {
-    public DBUser(){}
+public class SQLUserDAO implements UserDAO{
+    public SQLUserDAO(){}
     public void clear(){
 
     }

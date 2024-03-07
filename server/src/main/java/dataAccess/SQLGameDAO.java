@@ -4,8 +4,8 @@ import model.GameData;
 
 import java.util.ArrayList;
 
-public class DBGame {
-    public DBGame(){}
+public class SQLGameDAO implements GameDAO{
+    public SQLGameDAO(){}
     public void clear(){
 
     }
