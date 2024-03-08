@@ -21,7 +21,7 @@ public class SQLAuthDAO implements AuthDAO {
     }
     public void clear(){
         try{
-            PreparedStatement statement = connection.prepareStatement("DROP table authTable");
+            PreparedStatement statement = connection.prepareStatement("DROP table auths");
             statement.executeUpdate();
             statement.close();
         } catch (SQLException e){
@@ -36,14 +36,14 @@ public class SQLAuthDAO implements AuthDAO {
     public void addAuthData(String authToken, AuthData authData){
         try {
             // Create a PreparedStatement with the INSERT statement
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO authTable (authToken, username) VALUES (?, ?)");
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO auths (authToken, username) VALUES (?, ?)");
 
             // Set values for the placeholders in the SQL statement
             statement.setString(1, authToken);
             statement.setString(2, authData.getUsername());
 
             // Execute the INSERT statement
-            statement.executeUpdate();
+            statement.execute();
 
             // Close the statement
             statement.close();
@@ -53,7 +53,7 @@ public class SQLAuthDAO implements AuthDAO {
     }
     public AuthData getAuth(String authToken) throws SQLException {
         AuthData authData = null;
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM authTable WHERE authToken=?");
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM auths WHERE authToken=?");
         statement.setString(1, authToken);
         ResultSet resultSet = statement.executeQuery();
         if (resultSet.next()){
@@ -65,7 +65,7 @@ public class SQLAuthDAO implements AuthDAO {
 
     public void deleteAuth(String authToken){
         try{
-            PreparedStatement statement = connection.prepareStatement("DELETE FROM authTable WHERE authToken=?");
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM auths WHERE authToken=?");
             statement.setString(1, authToken);
             statement.executeUpdate();
         } catch (SQLException e){

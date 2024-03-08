@@ -12,12 +12,11 @@ import static java.sql.Statement.RETURN_GENERATED_KEYS;
 public class SQLUserDAO implements UserDAO{
     private Connection connection;
     public SQLUserDAO() throws DataAccessException {
-        //configureDatabase();
         this.connection = DatabaseManager.getConnection();
     }
     public void clear(){
         try{
-            PreparedStatement statement = connection.prepareStatement("DROP table userTable");
+            PreparedStatement statement = connection.prepareStatement("DROP table users");
             statement.executeUpdate();
             statement.close();
 
@@ -36,7 +35,7 @@ public class SQLUserDAO implements UserDAO{
     }
     public void addUser(String username, UserData user){
         try {
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO userTable (username, hashedPassword, email) VALUES (?, ?, ?)");
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO users (username, password, email) VALUES (?, ?, ?)");
             statement.setString(1, username);
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
             String hashedPassword = encoder.encode(user.getPassword());
@@ -50,7 +49,7 @@ public class SQLUserDAO implements UserDAO{
         }
     }
     public UserData getUser(String username) throws SQLException{
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM userTable WHERE username=?");
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM users WHERE username=?");
         statement.setString(1, username);
         ResultSet resultSet = statement.executeQuery();
         UserData user = null;

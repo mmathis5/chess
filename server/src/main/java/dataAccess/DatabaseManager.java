@@ -51,7 +51,7 @@ public class DatabaseManager {
             var conn = DriverManager.getConnection(connectionUrl, user, password);
 
             try (var preparedStatement = conn.prepareStatement(statement)) {
-                preparedStatement.executeUpdate();
+                preparedStatement.execute();
             }
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
@@ -59,18 +59,18 @@ public class DatabaseManager {
     }
 
     static void createUserTable() throws SQLException {
-        String createUserTableSQL = "CREATE TABLE IF NOT EXISTS userTable (" +
+        String createUserTableSQL = "CREATE TABLE IF NOT EXISTS users (" +
                 "username VARCHAR(100) PRIMARY KEY," +
                 "password VARCHAR(100) NOT NULL," +
                 "email VARCHAR(100)" +
                 ")";
         var conn = DriverManager.getConnection(connectionUrl, user, password);
         try (var preparedStatement = conn.prepareStatement(createUserTableSQL)) {
-            preparedStatement.executeUpdate();
+            preparedStatement.execute();
         }
     }
     static void createAuthTable() throws SQLException {
-        String createUserTableSQL = "CREATE TABLE IF NOT EXISTS authTable (" +
+        String createUserTableSQL = "CREATE TABLE IF NOT EXISTS auths (" +
                 "authToken VARCHAR(100) PRIMARY KEY," +
                 "username VARCHAR(100) NOT NULL" +
                 ")";
@@ -85,7 +85,7 @@ public class DatabaseManager {
     }
 
     static void createGameTable() throws SQLException {
-        String createUserTableSQL = "CREATE TABLE IF NOT EXISTS gameTable (" +
+        String createUserTableSQL = "CREATE TABLE IF NOT EXISTS games (" +
                 "gameName VARCHAR(100)," +
                 "gameID INT," +
                 "whiteUsername VARCHAR(100)," +
@@ -94,7 +94,7 @@ public class DatabaseManager {
                 ")";
         var conn = DriverManager.getConnection(connectionUrl, user, password);
         try (var preparedStatement = conn.prepareStatement(createUserTableSQL)) {
-            preparedStatement.executeUpdate();
+            preparedStatement.execute();
         }
     }
     /**
