@@ -86,10 +86,4 @@ public class UserService {
             }
         }
 
-    String encryptPassword(String password) {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        return encoder.encode(password);
-    }
-
-
 }

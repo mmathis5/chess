@@ -71,12 +71,4 @@ public class SQLAuthDAO implements AuthDAO {
         }
     }
 
-//    private void configureDatabase() throws DataAccessException {
-//        DatabaseManager.createDatabase();
-//        try (var conn = DatabaseManager.getConnection()) {
-//            DatabaseManager.createAuthTable(conn);
-//        } catch (SQLException ex) {
-//            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
-//        }
-//    }
 }
