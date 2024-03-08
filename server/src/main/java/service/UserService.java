@@ -4,6 +4,7 @@ import dataAccess.exceptions.DataAccessException;
 import dataAccess.exceptions.InternalFailureException;
 import dataAccess.exceptions.UsernameExistsException;
 import model.*;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Objects;
@@ -24,7 +25,7 @@ public class UserService {
             if (this.userDAO.userExists(username)) {
                 throw new DataAccessException("this user already exists");
             }
-            //insert into the hashmap
+            //insert into the DAO
             this.userDAO.addUser(username, user);
             //get the next authToken
             String authToken = this.authDAO.generateAuthToken();
@@ -49,10 +50,8 @@ public class UserService {
                 if (userData == null){
                     throw new DataAccessException("this user doesn't exists");
                 }
-
-                String hashedPassword = encryptPassword(password);
-                String storedPassword = userData.getPassword();
-                if (!Objects.equals(hashedPassword, userData.getPassword())) {
+                //validate the password
+                if (!BCrypt.checkpw(password, userData.getPassword())) {
                     throw new DataAccessException("password doesn't match user");
                 }
                 String authToken = this.authDAO.generateAuthToken();

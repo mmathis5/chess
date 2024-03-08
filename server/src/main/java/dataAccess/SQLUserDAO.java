@@ -38,8 +38,7 @@ public class SQLUserDAO implements UserDAO{
             PreparedStatement statement = connection.prepareStatement("INSERT INTO users (username, password, email) VALUES (?, ?, ?)");
             statement.setString(1, username);
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-            String hashedPassword = encoder.encode("123");
-            String hashed2 = encoder.encode("123");
+            String hashedPassword = encoder.encode(user.getPassword());
             statement.setString(2, hashedPassword);
             statement.setString(3, user.getEmail());
 
