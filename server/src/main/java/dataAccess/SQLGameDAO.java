@@ -41,7 +41,7 @@ public class SQLGameDAO implements GameDAO{
             //turn the gameData into a json before serializing
             Gson gson = new Gson();
             String jsonString = gson.toJson(gameData);
-            statement.setBytes(5, jsonString.getBytes());
+            statement.setString(5, jsonString);
             statement.execute();
             statement.close();
         } catch (SQLException e) {
@@ -60,17 +60,16 @@ public class SQLGameDAO implements GameDAO{
                 int gameID = resultSet.getInt("gameID");
                 String whiteUsername = resultSet.getString("whiteUsername");
                 String blackUsername = resultSet.getString("blackUsername");
-                byte[] serializedGameData = resultSet.getBytes("game");
-
-                GameData gameData = GameData.deserialize(serializedGameData);
-
-                gamesList.add(gameData);
+                String jsonGame = resultSet.getString("game");
+                //deserialize the game and put it into a gson
+                GameData gsonGameData = new Gson().fromJson(jsonGame, GameData.class);
+                gamesList.add(gsonGameData);
             }
 
             // Close the result set and statement
             resultSet.close();
             statement.close();
-        } catch (SQLException | IOException | ClassNotFoundException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return gamesList;
@@ -81,42 +80,34 @@ public class SQLGameDAO implements GameDAO{
         statement.setInt(1, gameID);
         ResultSet resultSet = statement.executeQuery();
         if (resultSet.next()){
-            byte[] serializedGameData = resultSet.getBytes("gameData");
-            gameData = GameData.deserialize(serializedGameData);
+            String gameName = resultSet.getString("gameName");
+            gameData = new GameData(gameName, gameID);
         }
         return gameData;
     }
 
     public void updateGame(Integer gameID, GameData gameData){
         try {
-        // Serialize the GameData object
-        byte[] serializedGameData = gameData.serialize();
+        // Serialize the new GameData object
+        Gson gson = new Gson();
+        String jsonString = gson.toJson(gameData);
 
-        // Prepare SQL statement
+            // Prepare SQL statement
         String query = "UPDATE games SET gameName = ?, whiteUsername = ?, blackUsername = ?, game = ? WHERE gameID = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             // Set parameters for the SQL statement
             statement.setString(1, gameData.getGameName());
             statement.setString(2, gameData.getWhiteUser());
             statement.setString(3, gameData.getBlackUser());
-            statement.setBytes(4, serializedGameData);
+            statement.setString(4, jsonString);
             statement.setInt(5, gameID);
 
             // Execute the SQL statement
             statement.executeUpdate();
         }
-    } catch (SQLException | IOException e) {
+    } catch (SQLException e) {
         e.printStackTrace();
     }
-    }
-
-//    private void configureDatabase() throws DataAccessException {
-//        DatabaseManager.createDatabase();
-//        try (var conn = DatabaseManager.getConnection()) {
-//            DatabaseManager.createGameTable(conn);
-//        } catch (SQLException ex) {
-//            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
-//        }
-//    }
+}
 
 }

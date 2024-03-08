@@ -16,11 +16,11 @@ public class GameData {
     private ArrayList<String> observers = new ArrayList<String>();
 
     //init function
-    public GameData(String gameName, Integer gameID){
+    public GameData(String gameName, Integer gameID) {
         this.gameName = gameName;
         this.gameID = gameID;
-
     }
+
 
     public void setWhiteUser(String username){
         this.whiteUsername = username;

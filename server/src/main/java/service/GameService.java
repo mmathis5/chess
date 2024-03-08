@@ -91,13 +91,7 @@ public class GameService {
             //update the game in the hashMap
             this.gameDAO.updateGame(gameID, game);
         }
-        catch (DataAccessException e){
-            throw e;
-        }
-        catch (JoinGameColorException e){
-            throw e;
-        }
-        catch (BadRequestException e){
+        catch (DataAccessException | JoinGameColorException | BadRequestException e){
             throw e;
         }
         catch (Exception e){
