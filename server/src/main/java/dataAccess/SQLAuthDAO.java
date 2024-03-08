@@ -29,9 +29,7 @@ public class SQLAuthDAO implements AuthDAO {
         }
     }
     public String generateAuthToken(){
-        String authToken = String.valueOf(nextAuthToken);
-        nextAuthToken++;
-        return authToken;
+        return String.valueOf(Math.random());
     }
     public void addAuthData(String authToken, AuthData authData){
         try {

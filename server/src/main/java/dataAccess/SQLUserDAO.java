@@ -38,7 +38,8 @@ public class SQLUserDAO implements UserDAO{
             PreparedStatement statement = connection.prepareStatement("INSERT INTO users (username, password, email) VALUES (?, ?, ?)");
             statement.setString(1, username);
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-            String hashedPassword = encoder.encode(user.getPassword());
+            String hashedPassword = encoder.encode("123");
+            String hashed2 = encoder.encode("123");
             statement.setString(2, hashedPassword);
             statement.setString(3, user.getEmail());
 
@@ -50,6 +51,7 @@ public class SQLUserDAO implements UserDAO{
     }
     public UserData getUser(String username) throws SQLException{
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM users WHERE username=?");
+
         statement.setString(1, username);
         ResultSet resultSet = statement.executeQuery();
         UserData user = null;

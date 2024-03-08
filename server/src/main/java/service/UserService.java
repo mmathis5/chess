@@ -4,6 +4,7 @@ import dataAccess.exceptions.DataAccessException;
 import dataAccess.exceptions.InternalFailureException;
 import dataAccess.exceptions.UsernameExistsException;
 import model.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Objects;
 
@@ -43,14 +44,14 @@ public class UserService {
     }
         public AuthData login(String username, String password) throws DataAccessException, InternalFailureException {
             try {
-                //check if the username already exists in the database
-                if (!this.userDAO.userExists(username)) {
-                    throw new DataAccessException("this user doesn't exists");
-                }
                 //validate that username and password match
                 UserData userData = this.userDAO.getUser(username);
-                String recordedPassword = userData.getPassword();
-                if (!Objects.equals(recordedPassword, password)) {
+                if (userData == null){
+                    throw new DataAccessException("this user doesn't exists");
+                }
+                BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+                String hashedPassword = encoder.encode(password);
+                if (!encoder.matches(hashedPassword, userData.getPassword())) {
                     throw new DataAccessException("password doesn't match user");
                 }
                 String authToken = this.authDAO.generateAuthToken();
