@@ -21,7 +21,7 @@ public class SQLAuthDAO implements AuthDAO {
     }
     public void clear(){
         try{
-            PreparedStatement statement = connection.prepareStatement("DROP table auths");
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM auths");
             statement.executeUpdate();
             statement.close();
         } catch (SQLException e){

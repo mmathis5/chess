@@ -16,7 +16,7 @@ public class SQLUserDAO implements UserDAO{
     }
     public void clear(){
         try{
-            PreparedStatement statement = connection.prepareStatement("DROP table users");
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM users");
             statement.executeUpdate();
             statement.close();
 

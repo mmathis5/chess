@@ -22,7 +22,7 @@ public class SQLGameDAO implements GameDAO{
     }
     public void clear(){
         try{
-            PreparedStatement statement = connection.prepareStatement("DROP table games");
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM games");
             statement.executeUpdate();
             statement.close();
         } catch (SQLException e){
@@ -30,8 +30,7 @@ public class SQLGameDAO implements GameDAO{
         }
     }
     public Integer createGame(String authToken, String gameName){
-        Integer gameID = nextGameID;
-        nextGameID = nextGameID++;
+        Integer gameID = (int) (Math.random() * 10000);
         try {
             GameData gameData = new GameData(gameName, gameID);
             PreparedStatement statement = connection.prepareStatement("INSERT INTO games (gameID, whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)");
