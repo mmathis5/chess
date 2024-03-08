@@ -81,7 +81,15 @@ public class SQLGameDAO implements GameDAO{
         ResultSet resultSet = statement.executeQuery();
         if (resultSet.next()){
             String gameName = resultSet.getString("gameName");
+            String whiteUser = resultSet.getString("whiteUsername");
+            String blackUser = resultSet.getString("blackUsername");
+            String game = resultSet.getString("game");
+            Gson gson = new Gson();
+            ChessGame chessGame = gson.fromJson(game, ChessGame.class);
             gameData = new GameData(gameName, gameID);
+            gameData.setWhiteUser(whiteUser);
+            gameData.setBlackUser(blackUser);
+            gameData.setChessGame(chessGame);
         }
         return gameData;
     }

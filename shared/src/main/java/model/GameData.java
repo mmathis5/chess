@@ -12,7 +12,7 @@ public class GameData {
 
     private String blackUsername;
     private String gameName;
-    private final ChessGame chessGame = new ChessGame();
+    private ChessGame chessGame = new ChessGame();
     private ArrayList<String> observers = new ArrayList<String>();
 
     //init function
@@ -42,20 +42,6 @@ public class GameData {
         return this.gameName;
     }
 
-    public byte[] serialize() throws IOException {
-        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-             ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream)) {
-            objectOutputStream.writeObject(this);
-            return byteArrayOutputStream.toByteArray();
-        }
-    }
-
-    // Deserialize method to convert byte array to object
-    public static GameData deserialize(byte[] data) throws IOException, ClassNotFoundException {
-        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);
-             ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream)) {
-            return (GameData) objectInputStream.readObject();
-        }
-    }
+    public void setChessGame(ChessGame chessGame){this.chessGame = chessGame;}
 
 }

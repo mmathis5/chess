@@ -49,13 +49,12 @@ public class UserService {
                 if (userData == null){
                     throw new DataAccessException("this user doesn't exists");
                 }
-                BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-                String hashedPassword = encoder.encode(password);
-                //temporarily get rid of the hashed exception
 
-//                if (!encoder.matches(hashedPassword, userData.getPassword())) {
-//                    throw new DataAccessException("password doesn't match user");
-//                }
+                String hashedPassword = encryptPassword(password);
+                String storedPassword = userData.getPassword();
+                if (!Objects.equals(hashedPassword, userData.getPassword())) {
+                    throw new DataAccessException("password doesn't match user");
+                }
                 String authToken = this.authDAO.generateAuthToken();
                 //generate a new AuthData object
                 AuthData authData = new AuthData(authToken, username);
@@ -87,6 +86,11 @@ public class UserService {
                 throw new InternalFailureException("Something went wrong internally");
             }
         }
+
+    String encryptPassword(String password) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        return encoder.encode(password);
+    }
 
 
 }

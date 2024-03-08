@@ -62,14 +62,4 @@ public class SQLUserDAO implements UserDAO{
         }
         return user;
     }
-
-//    private void configureDatabase() throws DataAccessException {
-//        DatabaseManager.createDatabase();
-//        try (var conn = DatabaseManager.getConnection()) {
-//            DatabaseManager.createUserTable(conn);
-//        } catch (SQLException ex) {
-//            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
-//        }
-//    }
-
 }
