@@ -16,7 +16,7 @@ public class SQLGameDAO implements GameDAO{
     private Connection connection;
     private int nextGameID = 1;
     public SQLGameDAO() throws DataAccessException {// Initialize the database connection
-        configureDatabase();
+        //configureDatabase();
     }
     public void clear(){
         try{
@@ -74,11 +74,14 @@ public class SQLGameDAO implements GameDAO{
         return gamesList;
     }
     public GameData getGame(Integer gameID) throws SQLException, IOException, ClassNotFoundException {
+        GameData gameData = null;
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM gameTable WHERE gameID=?");
         statement.setInt(1, gameID);
         ResultSet resultSet = statement.executeQuery();
-        byte[] serializedGameData = resultSet.getBytes("gameData");
-        GameData gameData = GameData.deserialize(serializedGameData);
+        if (resultSet.next()){
+            byte[] serializedGameData = resultSet.getBytes("gameData");
+            gameData = GameData.deserialize(serializedGameData);
+        }
         return gameData;
     }
 
@@ -105,13 +108,13 @@ public class SQLGameDAO implements GameDAO{
     }
     }
 
-    private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (var conn = DatabaseManager.getConnection()) {
-            DatabaseManager.createGameTable(conn);
-        } catch (SQLException ex) {
-            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
-        }
-    }
+//    private void configureDatabase() throws DataAccessException {
+//        DatabaseManager.createDatabase();
+//        try (var conn = DatabaseManager.getConnection()) {
+//            DatabaseManager.createGameTable(conn);
+//        } catch (SQLException ex) {
+//            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
+//        }
+//    }
 
 }

@@ -12,7 +12,8 @@ import static java.sql.Statement.RETURN_GENERATED_KEYS;
 public class SQLUserDAO implements UserDAO{
     private Connection connection;
     public SQLUserDAO() throws DataAccessException {
-        configureDatabase();
+        //configureDatabase();
+        this.connection = DatabaseManager.getConnection();
     }
     public void clear(){
         try{
@@ -52,18 +53,22 @@ public class SQLUserDAO implements UserDAO{
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM userTable WHERE username=?");
         statement.setString(1, username);
         ResultSet resultSet = statement.executeQuery();
-        String hashedPassword = resultSet.getString("password");
-        String email = resultSet.getString("email");
-        return new UserData(username, hashedPassword, email);
+        UserData user = null;
+        if (resultSet.next()){
+            String hashedPassword = resultSet.getString("password");
+            String email = resultSet.getString("email");
+            user = new UserData(username, hashedPassword, email);
+        }
+        return user;
     }
 
-    private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (var conn = DatabaseManager.getConnection()) {
-            DatabaseManager.createUserTable(conn);
-        } catch (SQLException ex) {
-            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
-        }
-    }
+//    private void configureDatabase() throws DataAccessException {
+//        DatabaseManager.createDatabase();
+//        try (var conn = DatabaseManager.getConnection()) {
+//            DatabaseManager.createUserTable(conn);
+//        } catch (SQLException ex) {
+//            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
+//        }
+//    }
 
 }

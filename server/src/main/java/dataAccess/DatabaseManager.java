@@ -26,16 +26,24 @@ public class DatabaseManager {
 
                 var host = props.getProperty("db.host");
                 var port = Integer.parseInt(props.getProperty("db.port"));
-                connectionUrl = String.format("jdbc:mysql://%s:%d", host, port);
+                connectionUrl = String.format("jdbc:mysql://%s:%d/%s", host, port, databaseName);
             }
         } catch (Exception ex) {
             throw new RuntimeException("unable to process db.properties. " + ex.getMessage());
         }
     }
 
+
+
     /**
      * Creates the database if it does not already exist.
      */
+    public static void init() throws DataAccessException, SQLException {
+            createDatabase();
+            createAuthTable();
+            createGameTable();
+            createUserTable();
+    }
     static void createDatabase() throws DataAccessException {
         try {
             var statement = "CREATE DATABASE IF NOT EXISTS " + databaseName;
@@ -50,27 +58,33 @@ public class DatabaseManager {
         }
     }
 
-    static void createUserTable(Connection conn) throws SQLException {
+    static void createUserTable() throws SQLException {
         String createUserTableSQL = "CREATE TABLE IF NOT EXISTS userTable (" +
                 "username VARCHAR(100) PRIMARY KEY," +
                 "password VARCHAR(100) NOT NULL," +
                 "email VARCHAR(100)" +
                 ")";
+        var conn = DriverManager.getConnection(connectionUrl, user, password);
         try (var preparedStatement = conn.prepareStatement(createUserTableSQL)) {
             preparedStatement.executeUpdate();
         }
     }
-    static void createAuthTable(Connection conn) throws SQLException {
+    static void createAuthTable() throws SQLException {
         String createUserTableSQL = "CREATE TABLE IF NOT EXISTS authTable (" +
                 "authToken VARCHAR(100) PRIMARY KEY," +
                 "username VARCHAR(100) NOT NULL" +
                 ")";
+        var conn = DriverManager.getConnection(connectionUrl, user, password);
+
         try (var preparedStatement = conn.prepareStatement(createUserTableSQL)) {
-            preparedStatement.executeUpdate();
+            preparedStatement.execute();
+        } catch (Exception e) {
+            System.out.println("Err r" +e);
+            throw e;
         }
     }
 
-    static void createGameTable(Connection conn) throws SQLException {
+    static void createGameTable() throws SQLException {
         String createUserTableSQL = "CREATE TABLE IF NOT EXISTS gameTable (" +
                 "gameName VARCHAR(100)," +
                 "gameID INT," +
@@ -78,6 +92,7 @@ public class DatabaseManager {
                 "blackUsername VARCHAR(100)," +
                 "game BLOB" +
                 ")";
+        var conn = DriverManager.getConnection(connectionUrl, user, password);
         try (var preparedStatement = conn.prepareStatement(createUserTableSQL)) {
             preparedStatement.executeUpdate();
         }

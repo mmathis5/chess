@@ -23,6 +23,7 @@ public class Server {
     private final GameDAO gameDAO = new SQLGameDAO();
 
     public Server() throws SQLException, DataAccessException {
+        DatabaseManager.init();
         this.userService = new UserService(userDAO, authDAO);
         this.gameService = new GameService(gameDAO, authDAO);
         this.clearService = new ClearService(userDAO, gameDAO, authDAO);
@@ -79,7 +80,7 @@ public class Server {
             }
             catch (InternalFailureException e){
                 response.status(500);
-                return new Gson().toJson(Map.of("message", "Error: description"));
+                return new Gson().toJson(Map.of("message", "Error:" + e));
             }
         });
     }

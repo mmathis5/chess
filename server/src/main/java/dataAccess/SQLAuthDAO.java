@@ -4,6 +4,7 @@ import dataAccess.exceptions.DataAccessException;
 import model.AuthData;
 import model.UserData;
 
+import javax.xml.crypto.Data;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -15,7 +16,8 @@ public class SQLAuthDAO implements AuthDAO {
     private int nextAuthToken = 1;
 
     public SQLAuthDAO() throws DataAccessException {
-        configureDatabase();
+        //configureDatabase();
+        this.connection = DatabaseManager.getConnection();
     }
     public void clear(){
         try{
@@ -50,11 +52,15 @@ public class SQLAuthDAO implements AuthDAO {
         }
     }
     public AuthData getAuth(String authToken) throws SQLException {
+        AuthData authData = null;
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM authTable WHERE authToken=?");
         statement.setString(1, authToken);
         ResultSet resultSet = statement.executeQuery();
-        String username = resultSet.getString("username");
-        return new AuthData(authToken, username);
+        if (resultSet.next()){
+            String username = resultSet.getString("username");
+            authData = new AuthData(authToken, username);
+        }
+        return authData;
     }
 
     public void deleteAuth(String authToken){
@@ -67,12 +73,12 @@ public class SQLAuthDAO implements AuthDAO {
         }
     }
 
-    private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (var conn = DatabaseManager.getConnection()) {
-            DatabaseManager.createAuthTable(conn);
-        } catch (SQLException ex) {
-            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
-        }
-    }
+//    private void configureDatabase() throws DataAccessException {
+//        DatabaseManager.createDatabase();
+//        try (var conn = DatabaseManager.getConnection()) {
+//            DatabaseManager.createAuthTable(conn);
+//        } catch (SQLException ex) {
+//            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
+//        }
+//    }
 }
