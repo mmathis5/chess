@@ -18,12 +18,44 @@ public class Server {
     private static GameService gameService;
     private static ClearService clearService;
 
-    private final UserDAO userDAO = new SQLUserDAO();
-    private final AuthDAO authDAO = new SQLAuthDAO();
-    private final GameDAO gameDAO = new SQLGameDAO();
+    private final UserDAO userDAO;
 
-    public Server() throws SQLException, DataAccessException {
-        DatabaseManager.init();
+    {
+        try {
+            userDAO = new SQLUserDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private final AuthDAO authDAO;
+
+    {
+        try {
+            authDAO = new SQLAuthDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private final GameDAO gameDAO;
+
+    {
+        try {
+            gameDAO = new SQLGameDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Server(){
+        try {
+            DatabaseManager.init();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         this.userService = new UserService(userDAO, authDAO);
         this.gameService = new GameService(gameDAO, authDAO);
         this.clearService = new ClearService(userDAO, gameDAO, authDAO);

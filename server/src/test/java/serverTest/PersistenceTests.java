@@ -32,7 +32,7 @@ public class PersistenceTests {
         server.stop();
     }
 
-    public static void startServer() throws SQLException, DataAccessException {
+    public static void startServer(){
         server = new Server();
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
