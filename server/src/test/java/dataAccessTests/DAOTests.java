@@ -178,9 +178,7 @@ public class DAOTests {
     @DisplayName("Create Game")
     public void createGamePass() throws SQLException, DataAccessException {
         String authToken = authDAO.generateAuthToken();
-        AuthData authData = new AuthData(authToken, "user");
-        authDAO.addAuthData(authToken, authData);
-        Assertions.assertThrows(Exception.class, () -> authDAO.deleteAuth("fake token"));
+        Assertions.assertDoesNotThrow(() -> gameDAO.createGame(authToken, "testGame"));
     }
 
     @Test
