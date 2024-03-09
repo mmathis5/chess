@@ -31,8 +31,11 @@ public class SQLAuthDAO implements AuthDAO {
     public String generateAuthToken(){
         return String.valueOf(Math.random());
     }
-    public void addAuthData(String authToken, AuthData authData){
+    public void addAuthData(String authToken, AuthData authData) throws SQLException, DataAccessException {
         try {
+            if (getAuth(authToken) != null){
+                throw new DataAccessException("Something went wrong");
+            }
             // Create a PreparedStatement with the INSERT statement
             PreparedStatement statement = connection.prepareStatement("INSERT INTO auths (authToken, username) VALUES (?, ?)");
 
@@ -45,8 +48,9 @@ public class SQLAuthDAO implements AuthDAO {
 
             // Close the statement
             statement.close();
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            throw e;
         }
     }
     public AuthData getAuth(String authToken) throws SQLException {
@@ -61,14 +65,21 @@ public class SQLAuthDAO implements AuthDAO {
         return authData;
     }
 
-    public void deleteAuth(String authToken){
+    public void deleteAuth(String authToken) throws SQLException {
         try{
+            if (getAuth(authToken) == null){
+                throw new DataAccessException("Something went wrong");
+            }
             PreparedStatement statement = connection.prepareStatement("DELETE FROM auths WHERE authToken=?");
             statement.setString(1, authToken);
             statement.executeUpdate();
         } catch (SQLException e){
             e.printStackTrace();
+            throw new SQLException(e);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
         }
+
     }
 
 }

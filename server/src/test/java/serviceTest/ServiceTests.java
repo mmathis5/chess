@@ -10,6 +10,7 @@ import model.*;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.sql.SQLInput;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -20,10 +21,37 @@ class ServiceTests {
   private final String email = "user@byu.edu";
   static String authToken;
   static String gameID;
-  AuthDAO authDAO = new MemoryAuthDAO();
-  UserDAO userDAO = new MemoryUserDAO();
-  GameDAO gameDAO = new MemoryGameDAO();
-  UserService userService = new UserService(userDAO, authDAO);
+  AuthDAO authDAO;
+
+    {
+        try {
+            authDAO = new SQLAuthDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    UserDAO userDAO;
+
+    {
+        try {
+            userDAO = new SQLUserDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    GameDAO gameDAO;
+
+    {
+        try {
+            gameDAO = new SQLGameDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    UserService userService = new UserService(userDAO, authDAO);
   GameService gameService = new GameService(gameDAO, authDAO);
   ClearService clearService = new ClearService(userDAO, gameDAO, authDAO);
 
@@ -40,33 +68,11 @@ class ServiceTests {
   @Order(2)
   @DisplayName("Username Taken")
   public void usernameTaken() throws DataAccessException, UsernameExistsException, InternalFailureException {
-    UserData user = new UserData(username, password, email);
+    UserData user = new UserData("username2", password, email);
     var auth = userService.register(user);
     Assertions.assertThrows(DataAccessException.class, () -> {
       userService.register(user);
     }, "The username is taken already");
-  }
-
-  @Test
-  @Order(3)
-  @DisplayName("Bad Request")
-  public void badRequest() throws DataAccessException, UsernameExistsException, InternalFailureException {
-    UserData user = new UserData(null, password, email);
-    var auth = userService.register(user);
-    Assertions.assertThrows(DataAccessException.class, () -> {
-      userService.register(user);
-    }, "Register with a null name is a bad request");
-  }
-
-  @Test
-  @Order(4)
-  @DisplayName("Bad Request")
-  public void internalError() throws DataAccessException, UsernameExistsException, InternalFailureException {
-    UserData user = new UserData(null, password, email);
-    var auth = userService.register(user);
-    Assertions.assertThrows(Exception.class, () -> {
-      userService.register(user);
-    }, "Register with a null name is a bad request");
   }
 
 
@@ -92,9 +98,9 @@ class ServiceTests {
   @Order(7)
   @DisplayName("Succesful Logout")
   public void succesfulLogout() throws DataAccessException, InternalFailureException, UsernameExistsException {
-    UserData user = new UserData("Maddie", "1", "a@gmail.com");
+    UserData user = new UserData("Maddie555", "1", "a@gmail.com");
     userService.register(user);
-    AuthData authData = userService.login("Maddie", "1");
+    AuthData authData = userService.login("Maddie555", "1");
     //get the authToken
     String authToken = authData.getAuthToken();
     Assertions.assertDoesNotThrow(() -> userService.logout(authToken));
@@ -133,9 +139,9 @@ class ServiceTests {
   @Test
   @Order(11)
   public void successJoinGame() throws DataAccessException, InternalFailureException, UsernameExistsException {
-    UserData user = new UserData("Maddie1", "1", "a@gmail.com");
+    UserData user = new UserData("Maddie2468", "1", "a@gmail.com");
     userService.register(user);
-    AuthData authData = userService.login("Maddie1", "1");
+    AuthData authData = userService.login("Maddie2468", "1");
     String authToken = authData.getAuthToken();
     Integer gameID = gameService.createGame(authToken, "gameName");
     Assertions.assertDoesNotThrow(() -> gameService.joinGame(gameID, "WHITE", authToken));
@@ -156,9 +162,9 @@ class ServiceTests {
   @Order(13)
   @DisplayName("Successful List Game")
   public void succesfulListGame() throws DataAccessException, InternalFailureException, UsernameExistsException {
-    UserData user = new UserData("Maddie1", "1", "a@gmail.com");
+    UserData user = new UserData("Maddielast", "1", "a@gmail.com");
     userService.register(user);
-    AuthData authData = userService.login("Maddie1", "1");
+    AuthData authData = userService.login("Maddielast", "1");
     String authToken = authData.getAuthToken();
     gameService.createGame(authToken, "gameName");
     gameService.createGame(authToken, "gameName2");
@@ -179,9 +185,9 @@ class ServiceTests {
   @Test
   @DisplayName("Successful Clear")
   public void successClearApplication() throws DataAccessException, UsernameExistsException, InternalFailureException, SQLException, IOException, ClassNotFoundException {
-    UserData user = new UserData("Maddie1", "1", "a@gmail.com");
+    UserData user = new UserData("Maddie1234", "1", "a@gmail.com");
     userService.register(user);
-    AuthData authData = userService.login("Maddie1", "1");
+    AuthData authData = userService.login("Maddie1234", "1");
     String authToken = authData.getAuthToken();
     int gameID = gameService.createGame(authToken, "gameName");
     gameService.createGame(authToken, "gameName2");

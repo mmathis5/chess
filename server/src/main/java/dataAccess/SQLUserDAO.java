@@ -1,6 +1,7 @@
 package dataAccess;
 
 import dataAccess.exceptions.DataAccessException;
+import dataAccess.exceptions.UsernameExistsException;
 import model.UserData;
 import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -33,8 +34,11 @@ public class SQLUserDAO implements UserDAO{
             throw new RuntimeException(e);
         }
     }
-    public void addUser(String username, UserData user){
+    public void addUser(String username, UserData user) throws SQLException, UsernameExistsException {
         try {
+            if (userExists(username)){
+                throw new UsernameExistsException("this username is already taken");
+            }
             PreparedStatement statement = connection.prepareStatement("INSERT INTO users (username, password, email) VALUES (?, ?, ?)");
             statement.setString(1, username);
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -46,6 +50,9 @@ public class SQLUserDAO implements UserDAO{
             statement.close();
         } catch (SQLException e) {
             e.printStackTrace();
+            throw e;
+        }catch (UsernameExistsException e){
+            throw e;
         }
     }
     public UserData getUser(String username) throws SQLException{
