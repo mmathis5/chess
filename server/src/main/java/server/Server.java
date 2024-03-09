@@ -20,37 +20,40 @@ public class Server {
 
     private final UserDAO userDAO;
 
-    {
-        try {
-            userDAO = new SQLUserDAO();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
+//    {
+//        try {
+//            userDAO = new SQLUserDAO();
+//        } catch (DataAccessException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
     private final AuthDAO authDAO;
 
-    {
-        try {
-            authDAO = new SQLAuthDAO();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
+//    {
+//        try {
+//            authDAO = new SQLAuthDAO();
+//        } catch (DataAccessException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
     private final GameDAO gameDAO;
 
-    {
-        try {
-            gameDAO = new SQLGameDAO();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
+//    {
+//        try {
+//            gameDAO = new SQLGameDAO();
+//        } catch (DataAccessException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
     public Server(){
         try {
             DatabaseManager.init();
+            gameDAO = new SQLGameDAO();
+            userDAO = new SQLUserDAO();
+            authDAO = new SQLAuthDAO();
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         } catch (SQLException e) {
