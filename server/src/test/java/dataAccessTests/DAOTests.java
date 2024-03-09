@@ -191,4 +191,46 @@ public class DAOTests {
         Assertions.assertThrows(Exception.class, () -> authDAO.deleteAuth("fake token"));
     }
 
+    @Test
+    @Order(18)
+    @DisplayName("Get Game Pass")
+    public void getGamePass() throws SQLException, DataAccessException {
+
+    }
+
+    @Test
+    @Order(19)
+    @DisplayName("Get Game Fail")
+    public void getGameFail() throws SQLException, DataAccessException {
+
+    }
+
+    @Test
+    @Order(20)
+    @DisplayName("Get Game List Pass")
+    public void getGameListPass() throws SQLException, DataAccessException {
+
+    }
+    @Test
+    @Order(21)
+    @DisplayName("Get Game List Fail")
+    public void getGameListFail() throws SQLException, DataAccessException {
+
+    }
+
+    @Test
+    @Order(22)
+    @DisplayName("Update Game Pass")
+    public void updateGamePass() throws SQLException, DataAccessException {
+
+    }
+    @Test
+    @Order(23)
+    @DisplayName("Update Game Fail")
+    public void updateGameFail() throws SQLException, DataAccessException {
+
+    }
+
+
+
 }
