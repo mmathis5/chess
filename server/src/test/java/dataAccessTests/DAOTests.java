@@ -7,6 +7,8 @@ import dataAccess.exceptions.UsernameExistsException;
 import model.*;
 import org.junit.jupiter.api.*;
 
+import java.io.IOException;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class DAOTests {
@@ -195,40 +197,59 @@ public class DAOTests {
     @Order(18)
     @DisplayName("Get Game Pass")
     public void getGamePass() throws SQLException, DataAccessException {
-
+        String authToken = authDAO.generateAuthToken();
+        Integer gameID = gameDAO.createGame(authToken, "test game");
+        Assertions.assertDoesNotThrow(() -> gameDAO.getGame(gameID));
     }
 
     @Test
     @Order(19)
     @DisplayName("Get Game Fail")
-    public void getGameFail() throws SQLException, DataAccessException {
-
+    public void getGameFail() throws SQLException, DataAccessException, IOException, ClassNotFoundException {
+        String authToken = authDAO.generateAuthToken();
+        Integer gameID = gameDAO.createGame(authToken, "test game");
+        Assertions.assertEquals(null, gameDAO.getGame(1234567));
     }
 
     @Test
     @Order(20)
     @DisplayName("Get Game List Pass")
     public void getGameListPass() throws SQLException, DataAccessException {
-
+        String authToken = authDAO.generateAuthToken();
+        gameDAO.createGame(authToken, "test game");
+        Assertions.assertDoesNotThrow(gameDAO::getGamesList);
     }
     @Test
     @Order(21)
-    @DisplayName("Get Game List Fail")
+    @DisplayName("Get Game List Empty")
     public void getGameListFail() throws SQLException, DataAccessException {
-
-    }
+        gameDAO.clear();
+        Assertions.assertEquals(0, gameDAO.getGamesList().size());    }
 
     @Test
     @Order(22)
     @DisplayName("Update Game Pass")
-    public void updateGamePass() throws SQLException, DataAccessException {
+    public void updateGamePass() throws SQLException, DataAccessException, IOException, ClassNotFoundException {
+        String authToken = authDAO.generateAuthToken();
+        String gameName = "Last Test";
+        Integer gameID = gameDAO.createGame(authToken, gameName);
+        GameData gameData = gameDAO.getGame(gameID);
+        gameData.setBlackUser("Maddie");
+        Assertions.assertDoesNotThrow(() -> gameDAO.updateGame(gameID, gameData));
 
     }
     @Test
     @Order(23)
-    @DisplayName("Update Game Fail")
-    public void updateGameFail() throws SQLException, DataAccessException {
-
+    @DisplayName("Update Game Deep Check")
+    public void updateGameFail() throws SQLException, DataAccessException, IOException, ClassNotFoundException {
+        String authToken = authDAO.generateAuthToken();
+        String gameName = "Last Test For Realsies";
+        Integer gameID = gameDAO.createGame(authToken, gameName);
+        GameData gameData = gameDAO.getGame(gameID);
+        gameData.setBlackUser("Maddie");
+        Assertions.assertDoesNotThrow(() -> gameDAO.updateGame(gameID, gameData));
+        GameData updatedGameData = gameDAO.getGame(gameID);
+        Assertions.assertEquals("Maddie", updatedGameData.getBlackUser());
     }
 
 
