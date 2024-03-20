@@ -1,6 +1,6 @@
 package ui;
 import ui.ServerFacade;
-import ui.ChessBoard;
+import ui.ChessBoardUI;
 
 public class ClientCommunicator {
 }
