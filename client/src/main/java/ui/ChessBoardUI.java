@@ -1,18 +1,22 @@
 package ui;
 import chess.ChessBoard;
-import ui.EscapeSequences;
 
+import static java.lang.System.out;
+import static ui.EscapeSequences.*;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Random;
 
 public class ChessBoardUI {
-    private static final int BOARD_SIZE_IN_SQUARES = 3;
-    private static final int SQUARE_SIZE_IN_CHARS = 3;
+    private static Boolean isWhite = true;
+    private static final int BOARD_SIZE_IN_SQUARES = 8;
+    private static final int SQUARE_SIZE_IN_CHARS = 1;
     private static final int LINE_WIDTH_IN_CHARS = 1;
-    private static final String EMPTY = "   ";
+    private static final String EMPTY = " ";
     //idk if I need these
-    // private static final String X = " X ";
-    //    private static final String O = " O ";
-    //    private static Random rand = new Random();
+     private static final String X = " X ";
+    private static final String O = " O ";
+    private static Random rand = new Random();
     private ChessBoard chessBoard;
     ChessBoardUI(ChessBoard chessBoard){
         this.chessBoard = chessBoard;
@@ -27,10 +31,11 @@ public class ChessBoardUI {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);
-
         drawHeaders(out);
 
         drawTicTacToeBoard(out);
+
+        drawHeaders(out);
 
         out.print(SET_BG_COLOR_BLACK);
         out.print(SET_TEXT_COLOR_WHITE);
@@ -40,12 +45,12 @@ public class ChessBoardUI {
 
         setBlack(out);
 
-        String[] headers = { "TIC", "TAC", "TOE" };
+        String[] headers = {"a", "b", "c", "d", "e", "f", "g", "h" };
         for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
             drawHeader(out, headers[boardCol]);
 
             if (boardCol < BOARD_SIZE_IN_SQUARES - 1) {
-                out.print(EMPTY.repeat(LINE_WIDTH_IN_CHARS));
+                out.print(SET_BG_COLOR_LIGHT_GREY);
             }
         }
 
@@ -53,27 +58,26 @@ public class ChessBoardUI {
     }
 
     private static void drawHeader(PrintStream out, String headerText) {
-        int prefixLength = SQUARE_SIZE_IN_CHARS / 2;
-        int suffixLength = SQUARE_SIZE_IN_CHARS - prefixLength - 1;
-
-        out.print(EMPTY.repeat(prefixLength));
+        out.print(SET_BG_COLOR_LIGHT_GREY);
+        out.print(EMPTY);
         printHeaderText(out, headerText);
-        out.print(EMPTY.repeat(suffixLength));
+        out.print(EMPTY);
+        setBlack(out);
     }
 
     private static void printHeaderText(PrintStream out, String player) {
-        out.print(SET_BG_COLOR_BLACK);
-        out.print(SET_TEXT_COLOR_GREEN);
-
         out.print(player);
-
-        setBlack(out);
     }
 
     private static void drawTicTacToeBoard(PrintStream out) {
 
         for (int boardRow = 0; boardRow < BOARD_SIZE_IN_SQUARES; ++boardRow) {
-
+            if (boardRow % 2 == 0){
+                isWhite = true;
+            }
+            else{
+                isWhite = false;
+            }
             drawRowOfSquares(out);
 
             if (boardRow < BOARD_SIZE_IN_SQUARES - 1) {
@@ -90,23 +94,11 @@ public class ChessBoardUI {
                 setWhite(out);
 
                 if (squareRow == SQUARE_SIZE_IN_CHARS / 2) {
-                    int prefixLength = SQUARE_SIZE_IN_CHARS / 2;
-                    int suffixLength = SQUARE_SIZE_IN_CHARS - prefixLength - 1;
-
-                    out.print(EMPTY.repeat(prefixLength));
-                    printPlayer(out, rand.nextBoolean() ? X : O);
-                    out.print(EMPTY.repeat(suffixLength));
+                    printSquare(out, rand.nextBoolean() ? X : O);
                 }
                 else {
                     out.print(EMPTY.repeat(SQUARE_SIZE_IN_CHARS));
                 }
-
-                if (boardCol < BOARD_SIZE_IN_SQUARES - 1) {
-                    // Draw right line
-                    setRed(out);
-                    out.print(EMPTY.repeat(LINE_WIDTH_IN_CHARS));
-                }
-
                 setBlack(out);
             }
 
@@ -118,14 +110,6 @@ public class ChessBoardUI {
 
         int boardSizeInSpaces = BOARD_SIZE_IN_SQUARES * SQUARE_SIZE_IN_CHARS +
                 (BOARD_SIZE_IN_SQUARES - 1) * LINE_WIDTH_IN_CHARS;
-
-        for (int lineRow = 0; lineRow < LINE_WIDTH_IN_CHARS; ++lineRow) {
-            setRed(out);
-            out.print(EMPTY.repeat(boardSizeInSpaces));
-
-            setBlack(out);
-            out.println();
-        }
     }
 
     private static void setWhite(PrintStream out) {
@@ -143,13 +127,34 @@ public class ChessBoardUI {
         out.print(SET_TEXT_COLOR_BLACK);
     }
 
-    private static void printPlayer(PrintStream out, String player) {
-        out.print(SET_BG_COLOR_WHITE);
+    private static void setGray(PrintStream out){
+        out.print(SET_BG_COLOR_DARK_GREY);
         out.print(SET_TEXT_COLOR_BLACK);
+    }
 
+    private static void printSquare(PrintStream out, String player) {
+        if (isWhite()) {
+            out.print(SET_BG_COLOR_WHITE);
+            out.print(SET_TEXT_COLOR_BLUE);
+        }
+        else{
+            out.print(SET_BG_COLOR_BLACK);
+            out.print(SET_TEXT_COLOR_RED);
+        }
         out.print(player);
 
         setWhite(out);
+    }
+
+    private static Boolean isWhite(){
+        if (isWhite){
+            isWhite = false;
+            return true;
+        }
+        else{
+            isWhite = true;
+            return false;
+        }
     }
 }
 
