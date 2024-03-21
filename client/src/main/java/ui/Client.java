@@ -258,7 +258,7 @@ public class Client {
             scanner.nextLine();
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
-            System.out.println("Try to execute the command again");
+            System.out.println("Try to execute the command again\n");
         }
     }
 
