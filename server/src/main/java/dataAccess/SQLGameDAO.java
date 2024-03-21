@@ -97,26 +97,26 @@ public class SQLGameDAO implements GameDAO{
 
     public void updateGame(Integer gameID, GameData gameData){
         try {
-        // Serialize the new GameData object
-        Gson gson = new Gson();
-        String jsonString = gson.toJson(gameData);
+            // Serialize the new GameData object
+            Gson gson = new Gson();
+            String jsonString = gson.toJson(gameData);
 
             // Prepare SQL statement
-        String query = "UPDATE games SET gameName = ?, whiteUsername = ?, blackUsername = ?, game = ? WHERE gameID = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            // Set parameters for the SQL statement
-            statement.setString(1, gameData.getGameName());
-            statement.setString(2, gameData.getWhiteUser());
-            statement.setString(3, gameData.getBlackUser());
-            statement.setString(4, jsonString);
-            statement.setInt(5, gameID);
+            String query = "UPDATE games SET gameName = ?, whiteUsername = ?, blackUsername = ?, game = ? WHERE gameID = ?";
+            try (PreparedStatement statement = connection.prepareStatement(query)) {
+                // Set parameters for the SQL statement
+                statement.setString(1, gameData.getGameName());
+                statement.setString(2, gameData.getWhiteUser());
+                statement.setString(3, gameData.getBlackUser());
+                statement.setString(4, jsonString);
+                statement.setInt(5, gameID);
 
-            // Execute the SQL statement
-            statement.executeUpdate();
+                // Execute the SQL statement
+                statement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
     }
-}
 
 }

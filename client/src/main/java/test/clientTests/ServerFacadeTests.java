@@ -80,22 +80,22 @@ public class ServerFacadeTests {
     @Order(7)
     @DisplayName("Successful CreateGame")
     public void goodCreateGame() throws Exception {
-        String authToken = ui.ServerFacade.login("user", "password");
-        Assertions.assertDoesNotThrow(() -> ui.ServerFacade.createGame("test", authToken));
+        String authToken = ui.ServerFacade.register("gameuser", "password", "email");
+        Assertions.assertDoesNotThrow(() -> ui.ServerFacade.createGame("test1", authToken));
     }
 
+    //I need to create another test that checks if the gamename is unique.
     @Test
     @Order(8)
     @DisplayName("Failed CreateGame")
     public void badCreateGame() throws Exception {
-        //tries to create a game with a name that's already in use
         String authToken = ui.ServerFacade.login("user", "password");
         ui.ServerFacade.createGame("test", authToken);
-        Assertions.assertThrows(Exception.class, () -> ui.ServerFacade.createGame("test", authToken));
+        Assertions.assertThrows(Exception.class, () -> ui.ServerFacade.createGame("failtest", "fakeToken"));
     }
 
     @Test
-    @Order(8)
+    @Order(9)
     @DisplayName("Success ListGames")
     public void goodListGames() throws Exception {
         String authToken = ui.ServerFacade.login("user", "password");
@@ -103,7 +103,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    @Order(8)
+    @Order(10)
     @DisplayName("Success ListGames")
     public void failListGames() throws Exception {
         Assertions.assertThrows(Exception.class, () -> ui.ServerFacade.listGames("badAuth"));

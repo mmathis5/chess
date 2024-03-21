@@ -3,6 +3,7 @@ package ui;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.Gson;
+import dataAccess.SQLGameDAO;
 
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
@@ -22,7 +23,10 @@ public class ServerFacade {
             if (response.statusCode() == 200) {
                 JsonObject jsonObject = new Gson().fromJson(response.body(), JsonObject.class);
                 return jsonObject.get("authToken").getAsString();
-            } else {
+            } else if (response.statusCode() == 401){
+                throw new Exception("The entered username or password is invalid\n");
+            }
+            else {
                 throw new Exception("error during login " + response.statusCode());
             }
         } catch (Exception e) {

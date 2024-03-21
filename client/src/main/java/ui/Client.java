@@ -1,10 +1,7 @@
 package ui;
 import chess.ChessBoard;
 import chess.ChessGame;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import com.sun.nio.sctp.NotificationHandler;
 import dataAccess.SQLGameDAO;
 import model.GameData;
@@ -23,6 +20,7 @@ import java.util.Scanner;
 
 public class Client {
     String authToken = null;
+    String username = null;
     Scanner scanner = new Scanner(System.in);
     private HashMap<Integer, JsonElement> gamesListHashMap = new HashMap<Integer, JsonElement>();
 
@@ -124,8 +122,9 @@ public class Client {
             System.out.println("Enter Password:");
             String password = scanner.nextLine();
             this.authToken = ServerFacade.login(username, password);
+            this.username = username;
         }catch (Exception e){
-            System.out.println("Error during login" + e.getMessage());
+            System.out.println(e.getMessage());
         }
     }
     public void register(){
@@ -177,14 +176,15 @@ public class Client {
                 gson.toJson(jsonElement);
                 String gameName = jsonElement.getAsJsonObject().get("gameName").toString();
                 JsonElement jsonGameData = jsonElement.getAsJsonObject().getAsJsonObject("chessGame");
-                GameData chessGame = gson.fromJson(jsonGameData, GameData.class);
-                String blackUser = chessGame.getBlackUser();
-                String whiteUser = chessGame.getWhiteUser();
-                if (blackUser == null){
-                    blackUser = "none";
+                JsonElement whiteUserJson = jsonElement.getAsJsonObject().get("whiteUsername");
+                JsonElement blackUserJson = jsonElement.getAsJsonObject().get("blackUsername");
+                String whiteUser = "none";
+                String blackUser = "none";
+                if (whiteUserJson != null){
+                    whiteUser = whiteUserJson.toString();
                 }
-                if (whiteUser == null){
-                    whiteUser = "none";
+                if (blackUserJson != null){
+                    blackUser = blackUserJson.toString();
                 }
                 System.out.println(number + ".  " + "GameID = " + gameName + "  White User: " + whiteUser + "   BlackUser: " + blackUser);
             }
@@ -200,17 +200,6 @@ public class Client {
         gamesListHashMap.put(number, jsonElement);
     }
 
-    private void updateHashMap(){
-        try {
-            JsonArray newGamesList = ServerFacade.listGames(this.authToken);
-            for (int number = 1; number < newGamesList.size() + 1; number++) {
-                updateHashMapValue(Integer.valueOf(number), newGamesList);
-            }
-        }
-        catch(Exception e){
-            System.out.println("Something went wrong while we were trying to update the Games hashMap");
-        }
-    }
 
     public void joinGame(boolean needsPlayer) {
         try {
@@ -233,8 +222,17 @@ public class Client {
             if (needsPlayer){
                 playerColor = getPlayerColor();
             }
+            //validate that the player isn't already taken
+            JsonElement gameJsonElement = gamesListHashMap.get(Integer.valueOf(number));
+            JsonObject gameJson= gameJsonElement.getAsJsonObject();
+            if (Objects.equals(playerColor, "WHITE")){
+                gameJson.add("whiteUsername", new JsonPrimitive(username));
+            }
+            if (Objects.equals(playerColor, "BLACK")){
+                gameJson.add("blackUsername", new JsonPrimitive(username));
+            }
+            updateHashMapValue(Integer.valueOf(number), gameJson);
             //using the number, get the gameID
-            JsonElement gameJson = gamesListHashMap.get(Integer.valueOf(number));
             String gameID = gameJson.getAsJsonObject().get("gameID").toString();
             //make the http call
             ServerFacade.joinGame(this.authToken, gameID, playerColor);
@@ -242,8 +240,8 @@ public class Client {
 
 
             //get the game board
-            Gson gson = new Gson();
-            GameData chessGame = gson.fromJson(gameJson, GameData.class);
+            Gson gson2 = new Gson();
+            GameData chessGame = gson2.fromJson(gameJson, GameData.class);
             ChessBoard chessBoard = chessGame.getChessBoard();
             //display the game board
             ChessBoardUI chessBoardUI = new ChessBoardUI(chessBoard);
@@ -258,5 +256,8 @@ public class Client {
         }
     }
 
+    private boolean playerIsAvailable(){
+        return true;
+    }
 
 }
