@@ -126,9 +126,19 @@ public class Client {
     }
 
     public void logout(){
+        try{
+            ServerFacade.logout(this.authToken);
+            this.authToken = null;
+        }
+        catch (Exception e){
+            System.out.println("Error: "+ e.getMessage());
+        }
 
     }
     public void createGame(){
+        System.out.println("Enter Game Name: ");
+        String gameName = scanner.nextLine();
+
 
     }
     public void listGames(){

@@ -40,22 +40,39 @@ public class ServerFacadeTests {
 
     @Test
     @Order(2)
+    @DisplayName("Failed Register")
+    public void failedRegister(){
+        Assertions.assertThrows(Exception.class, () -> ui.ServerFacade.register("user4", "password", "email"));
+    }
+
+    @Test
+    @Order(3)
     @DisplayName("Successful Login")
     public void successLogin(){
         Assertions.assertDoesNotThrow(() -> ui.ServerFacade.login("user1", "password"));
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     @DisplayName("Fail Login")
     public void failLogin(){
         Assertions.assertThrows(Exception.class, () -> ui.ServerFacade.login("fakeuser", "password"));
     }
 
+
     @Test
-    @Order(2)
-    @DisplayName("Failed Login")
-    public void failedLogin(){
-        Assertions.assertThrows(Exception.class, () -> ui.ServerFacade.login("user", "password"));
+    @Order(5)
+    @DisplayName("Successful Logout")
+    public void successLogout() throws Exception {
+        String authToken = ui.ServerFacade.login("user4", "password");
+        Assertions.assertDoesNotThrow(() -> ui.ServerFacade.logout(authToken));
     }
+
+    @Test
+    @Order(5)
+    @DisplayName("Failed Logout")
+    public void failLogout() throws Exception {
+        Assertions.assertDoesNotThrow(() -> ui.ServerFacade.logout("invalidToken"));
+    }
+
 }
