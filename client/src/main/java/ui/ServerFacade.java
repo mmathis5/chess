@@ -19,8 +19,8 @@ public class ServerFacade {
         try {
             HttpResponse<String> response = ClientCommunicator.post(json, "/session");
             if (response.statusCode() == 200) {
-                System.out.println(response.body());
-                return "Token";
+                JsonObject jsonObject = new Gson().fromJson(response.body(), JsonObject.class);
+                return jsonObject.get("authToken").getAsString();
             } else {
                 throw new Exception("error during login " + response.statusCode());
             }
