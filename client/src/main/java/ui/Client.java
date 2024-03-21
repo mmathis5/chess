@@ -1,4 +1,5 @@
 package ui;
+import chess.ChessBoard;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -14,6 +15,7 @@ import ui.ServerFacade;
 import ui.ClientCommunicator;
 
 import java.io.Console;
+import java.net.http.HttpResponse;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
@@ -82,8 +84,8 @@ public class Client {
                 case "2" -> logout();
                 case "3" -> createGame();
                 case "4" -> listGames();
-                case "5" -> joinGame();
-                case "6" -> joinObserver();
+                case "5" -> joinGame(true);
+                case "6" -> joinGame(false);
                 default -> System.out.println("Unknown Command Number");
             };
         } catch (Exception ex) {
@@ -91,6 +93,10 @@ public class Client {
         }
     }
 
+    private String getPlayerColor(){
+        System.out.println("Enter 'White' or 'Black' to specify which player you wish to join");
+        return scanner.nextLine().toUpperCase();
+    }
     public void evalPreLogin(String input) {
         try {
             switch (input) {
@@ -151,7 +157,7 @@ public class Client {
         String gameName = scanner.nextLine();
         try{
             String gameID = ServerFacade.createGame(gameName, this.authToken);
-            System.out.println("GameID: " + gameID);
+            System.out.println("The game was created successfully!\n");
         }
         catch (Exception e){
             System.out.println("Error: " + e.getMessage());
@@ -166,7 +172,7 @@ public class Client {
             for (int number = 1; number < jsonList.size() + 1; number++){
                 JsonElement jsonElement = jsonList.get(number -1);
                 //add into the hashMap
-                gamesListHashMap.put(number, jsonElement);
+                updateHashMapValue(number, jsonElement);
                 Gson gson = new Gson();
                 gson.toJson(jsonElement);
                 String gameName = jsonElement.getAsJsonObject().get("gameName").toString();
@@ -190,24 +196,66 @@ public class Client {
         }
     }
 
-//    private GameData getGame(JsonElement jsonGameData){
-//        String gameName = gameDataJsonElement.("gameName");
-//        String whiteUser = resultSet.getString("whiteUsername");
-//        String blackUser = resultSet.getString("blackUsername");
-//        String game = resultSet.getString("game");
-//        Gson gson = new Gson();
-//        ChessGame chessGame = gson.fromJson(game, ChessGame.class);
-//        gameData = new GameData(gameName, gameID);
-//        gameData.setWhiteUser(whiteUser);
-//        gameData.setBlackUser(blackUser);
-//        gameData.setChessGame(chessGame);
-//    }
-    public void joinGame(){
-
+    private void updateHashMapValue(Integer number, JsonElement jsonElement){
+        gamesListHashMap.put(number, jsonElement);
     }
 
-    public void joinObserver(){
+    private void updateHashMap(){
+        try {
+            JsonArray newGamesList = ServerFacade.listGames(this.authToken);
+            for (int number = 1; number < newGamesList.size() + 1; number++) {
+                updateHashMapValue(Integer.valueOf(number), newGamesList);
+            }
+        }
+        catch(Exception e){
+            System.out.println("Something went wrong while we were trying to update the Games hashMap");
+        }
+    }
 
+    public void joinGame(boolean needsPlayer) {
+        try {
+            listGames();
+            System.out.println("Enter the number of the game you wish to join: ");
+            String number = scanner.nextLine();
+            boolean validGame = false;
+            while (!validGame) {
+                JsonElement gameJson = gamesListHashMap.get(Integer.valueOf(number));
+                if (gameJson == null){
+                    System.out.println("You have chosen an invalid game number. Enter a new valid number: ");
+                    number = scanner.nextLine();
+                }
+                else {
+                    validGame = true;
+                }
+            }
+            String playerColor = null;
+            //check if we need to get the player
+            if (needsPlayer){
+                playerColor = getPlayerColor();
+            }
+            //using the number, get the gameID
+            JsonElement gameJson = gamesListHashMap.get(Integer.valueOf(number));
+            String gameID = gameJson.getAsJsonObject().get("gameID").toString();
+            //make the http call
+            ServerFacade.joinGame(this.authToken, gameID, playerColor);
+            //update the hashMap
+
+
+            //get the game board
+            Gson gson = new Gson();
+            GameData chessGame = gson.fromJson(gameJson, GameData.class);
+            ChessBoard chessBoard = chessGame.getChessBoard();
+            //display the game board
+            ChessBoardUI chessBoardUI = new ChessBoardUI(chessBoard);
+            chessBoardUI.drawBoard();
+
+
+
+            System.out.println("Type anything to view the Gameplay Menu;");
+            scanner.nextLine();
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 
 

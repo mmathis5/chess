@@ -93,4 +93,16 @@ public class ServerFacade {
             throw e;
         }
     }
+
+    public static void joinGame(String authToken, String gameID, String playerColor) throws Exception {
+        try{
+            JsonObject json = new JsonObject();
+            json.addProperty("gameID", gameID);
+            json.addProperty("playerColor", playerColor);
+            ClientCommunicator.put(json, "/game", authToken);
+        }
+        catch(Exception e){
+            throw e;
+        }
+    }
 }

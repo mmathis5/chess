@@ -35,21 +35,21 @@ public class ServerFacadeTests {
     @Order(1)
     @DisplayName("Successful Register")
     public void successRegister(){
-        Assertions.assertDoesNotThrow(() -> ui.ServerFacade.register("user4", "password", "email"));
+        Assertions.assertDoesNotThrow(() -> ui.ServerFacade.register("user", "password", "email"));
     }
 
     @Test
     @Order(2)
     @DisplayName("Failed Register")
     public void failedRegister(){
-        Assertions.assertThrows(Exception.class, () -> ui.ServerFacade.register("user4", "password", "email"));
+        Assertions.assertThrows(Exception.class, () -> ui.ServerFacade.register("user", "password", "email"));
     }
 
     @Test
     @Order(3)
     @DisplayName("Successful Login")
     public void successLogin(){
-        Assertions.assertDoesNotThrow(() -> ui.ServerFacade.login("user1", "password"));
+        Assertions.assertDoesNotThrow(() -> ui.ServerFacade.login("user", "password"));
     }
 
     @Test
@@ -64,7 +64,7 @@ public class ServerFacadeTests {
     @Order(5)
     @DisplayName("Successful Logout")
     public void successLogout() throws Exception {
-        String authToken = ui.ServerFacade.login("user4", "password");
+        String authToken = ui.ServerFacade.login("user", "password");
         Assertions.assertDoesNotThrow(() -> ui.ServerFacade.logout(authToken));
     }
 
@@ -80,7 +80,7 @@ public class ServerFacadeTests {
     @Order(7)
     @DisplayName("Successful CreateGame")
     public void goodCreateGame() throws Exception {
-        String authToken = ui.ServerFacade.login("user4", "password");
+        String authToken = ui.ServerFacade.login("user", "password");
         Assertions.assertDoesNotThrow(() -> ui.ServerFacade.createGame("test", authToken));
     }
 
@@ -89,9 +89,25 @@ public class ServerFacadeTests {
     @DisplayName("Failed CreateGame")
     public void badCreateGame() throws Exception {
         //tries to create a game with a name that's already in use
-        String authToken = ui.ServerFacade.login("user4", "password");
+        String authToken = ui.ServerFacade.login("user", "password");
         ui.ServerFacade.createGame("test", authToken);
         Assertions.assertThrows(Exception.class, () -> ui.ServerFacade.createGame("test", authToken));
     }
+
+    @Test
+    @Order(8)
+    @DisplayName("Success ListGames")
+    public void goodListGames() throws Exception {
+        String authToken = ui.ServerFacade.login("user", "password");
+        Assertions.assertDoesNotThrow(() -> ui.ServerFacade.listGames(authToken));
+    }
+
+    @Test
+    @Order(8)
+    @DisplayName("Success ListGames")
+    public void failListGames() throws Exception {
+        Assertions.assertThrows(Exception.class, () -> ui.ServerFacade.listGames("badAuth"));
+    }
+
 
 }

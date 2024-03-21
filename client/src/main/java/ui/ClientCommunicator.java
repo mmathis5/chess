@@ -30,6 +30,16 @@ public class ClientCommunicator {
                 .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
+
+    public static HttpResponse<String> put(JsonObject json, String resource, String authToken) throws Exception{
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(serviceUrl + resource))
+                .header("authorization", authToken)
+                .PUT(HttpRequest.BodyPublishers.ofString(json.toString()))
+                .build();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
     public static void delete(String authToken) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(serviceUrl + "/session"))

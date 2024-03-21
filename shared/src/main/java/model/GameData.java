@@ -1,5 +1,6 @@
 package model;
 
+import chess.ChessBoard;
 import chess.ChessGame;
 
 import java.io.*;
@@ -19,6 +20,7 @@ public class GameData {
     public GameData(String gameName, Integer gameID) {
         this.gameName = gameName;
         this.gameID = gameID;
+        chessGame.getBoard().resetBoard();
     }
 
 
@@ -43,5 +45,7 @@ public class GameData {
     }
 
     public void setChessGame(ChessGame chessGame){this.chessGame = chessGame;}
-
+    public ChessBoard getChessBoard(){
+        return chessGame.getBoard();
+    }
 }

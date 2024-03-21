@@ -33,6 +33,7 @@ public class SQLGameDAO implements GameDAO{
         Integer gameID = (int) (Math.random() * 10000);
         try {
             GameData gameData = new GameData(gameName, gameID);
+            gameData.getChessBoard().resetBoard();
             PreparedStatement statement = connection.prepareStatement("INSERT INTO games (gameID, whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)");
             statement.setInt(1, gameID);
             statement.setString(2, null);

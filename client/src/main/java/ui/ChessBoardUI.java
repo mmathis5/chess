@@ -18,15 +18,9 @@ public class ChessBoardUI {
         this.chessBoard = chessBoard;
     }
 
-    public static void resetBoard(){
-        chessBoard.resetBoard();
-    }
-    public static void main(String[] args) {
+    public void drawBoard(){
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-        resetBoard();
-        //normal orientation
 
-        out.print(ERASE_SCREEN);
         drawHeaders(out);
         drawChessBoard(out);
         drawHeaders(out);
@@ -37,10 +31,9 @@ public class ChessBoardUI {
         drawChessBoardFlipped(out);
         drawHeaders(out);
 
-        out.print(SET_BG_COLOR_BLACK);
+        out.print(SET_BG_COLOR_DARK_GREY);
         out.print(SET_TEXT_COLOR_WHITE);
     }
-
     private static void drawHeaders(PrintStream out) {
 
         setBlack(out);
