@@ -138,11 +138,22 @@ public class Client {
     public void createGame(){
         System.out.println("Enter Game Name: ");
         String gameName = scanner.nextLine();
-
+        try{
+            String gameID = ServerFacade.createGame(gameName, this.authToken);
+            System.out.println("GameID: " + gameID);
+        }
+        catch (Exception e){
+            System.out.println("Error: " + e.getMessage());
+        }
 
     }
     public void listGames(){
-
+        try{
+            ui.ServerFacade.listGames(this.authToken);
+        }
+        catch(Exception e){
+            System.out.println("Error: " + e.getMessage());
+        }
     }
     public void joinGame(){
 

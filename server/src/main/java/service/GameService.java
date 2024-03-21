@@ -25,6 +25,8 @@ public class GameService {
             if (this.authDAO.getAuth(authToken) == null) {
                 throw new DataAccessException("this authToken isn't valid");
             }
+            //validates that the gameID isn't already taken
+
             //create new game and get the gameID
             return this.gameDAO.createGame(authToken, gameName);
 

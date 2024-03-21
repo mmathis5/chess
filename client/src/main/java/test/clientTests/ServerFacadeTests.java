@@ -69,10 +69,29 @@ public class ServerFacadeTests {
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     @DisplayName("Failed Logout")
     public void failLogout() throws Exception {
         Assertions.assertDoesNotThrow(() -> ui.ServerFacade.logout("invalidToken"));
+    }
+
+
+    @Test
+    @Order(7)
+    @DisplayName("Successful CreateGame")
+    public void goodCreateGame() throws Exception {
+        String authToken = ui.ServerFacade.login("user4", "password");
+        Assertions.assertDoesNotThrow(() -> ui.ServerFacade.createGame("test", authToken));
+    }
+
+    @Test
+    @Order(8)
+    @DisplayName("Failed CreateGame")
+    public void badCreateGame() throws Exception {
+        //tries to create a game with a name that's already in use
+        String authToken = ui.ServerFacade.login("user4", "password");
+        ui.ServerFacade.createGame("test", authToken);
+        Assertions.assertThrows(Exception.class, () -> ui.ServerFacade.createGame("test", authToken));
     }
 
 }

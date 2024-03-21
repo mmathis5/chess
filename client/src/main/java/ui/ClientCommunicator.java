@@ -19,17 +19,16 @@ public class ClientCommunicator {
                 .uri(URI.create(serviceUrl + resource))
                 .POST(HttpRequest.BodyPublishers.ofString(json.toString()))
                 .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        return response;
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
-    public static HttpResponse<String> postGame(JsonObject json, String resource) throws Exception{
+    public static HttpResponse<String> postGame(JsonObject json, String resource, String authToken) throws Exception{
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(serviceUrl + resource))
+                .header("authorization", authToken)
                 .POST(HttpRequest.BodyPublishers.ofString(json.toString()))
                 .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        return response;
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
     public static void delete(String authToken) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
@@ -38,5 +37,14 @@ public class ClientCommunicator {
                 .DELETE()
                 .build();
         client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    public static HttpResponse<String> get(String resourcs, String authToken) throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(serviceUrl + "/session"))
+                .header("authorization", authToken)
+                .GET()
+                .build();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 }
