@@ -125,6 +125,6 @@ public class ServerFacadeTests {
         ui.ServerFacade.joinGame(authToken, gameID, "WHITE");
         ui.ServerFacade.logout(authToken);
         ui.ServerFacade.login("iAm", "soTired");
-        Assertions.assertDoesNotThrow(() -> ui.ServerFacade.joinGame("badToken", gameID, "WHITE"));
+        Assertions.assertThrows(Exception.class, () -> ui.ServerFacade.joinGame("badToken", gameID, null));
     }
 }
