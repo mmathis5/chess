@@ -64,7 +64,7 @@ public class Server {
         this.clearService = new ClearService(userDAO, gameDAO, authDAO);
     }
 
-    private void clearEndpoint(){
+    public void clearEndpoint(){
         Spark.delete("/db", (request, response) -> {
             try {
                 //validate that the AuthToken is legal
