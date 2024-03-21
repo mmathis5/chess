@@ -81,17 +81,15 @@ public class ServerFacadeTests {
     @DisplayName("Successful CreateGame")
     public void goodCreateGame() throws Exception {
         String authToken = ui.ServerFacade.register("gameuser", "password", "email");
-        Assertions.assertDoesNotThrow(() -> ui.ServerFacade.createGame("test1", authToken));
+        Assertions.assertDoesNotThrow(() -> ui.ServerFacade.createGame("test", authToken));
     }
 
-    //I need to create another test that checks if the gamename is unique.
     @Test
     @Order(8)
     @DisplayName("Failed CreateGame")
     public void badCreateGame() throws Exception {
         String authToken = ui.ServerFacade.login("user", "password");
-        ui.ServerFacade.createGame("test", authToken);
-        Assertions.assertThrows(Exception.class, () -> ui.ServerFacade.createGame("failtest", "fakeToken"));
+        Assertions.assertThrows(Exception.class, () -> ui.ServerFacade.createGame("test", authToken));
     }
 
     @Test
@@ -109,5 +107,24 @@ public class ServerFacadeTests {
         Assertions.assertThrows(Exception.class, () -> ui.ServerFacade.listGames("badAuth"));
     }
 
+    @Test
+    @Order(11)
+    @DisplayName("Success JoinGame")
+    public void successJoinGame() throws Exception{
+        String authToken = ui.ServerFacade.register("iAm", "soTired", "ofCoding");
+        String gameID = ui.ServerFacade.createGame("newGame", authToken);
+        Assertions.assertDoesNotThrow(() -> ui.ServerFacade.joinGame(authToken, gameID, "WHITE"));
+    }
 
+    @Test
+    @Order(12)
+    @DisplayName("Fail JoinGame")
+    public void failJoinGame() throws Exception{
+        String authToken = ui.ServerFacade.register("iAmStill", "soTired", "ofCoding");
+        String gameID = ui.ServerFacade.createGame("lastTest", authToken);
+        ui.ServerFacade.joinGame(authToken, gameID, "WHITE");
+        ui.ServerFacade.logout(authToken);
+        ui.ServerFacade.login("iAm", "soTired");
+        Assertions.assertDoesNotThrow(() -> ui.ServerFacade.joinGame("badToken", gameID, "WHITE"));
+    }
 }

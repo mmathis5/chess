@@ -74,7 +74,7 @@ public class ServerFacade {
                 JsonObject jsonObject = new Gson().fromJson(response.body(), JsonObject.class);
                 return jsonObject.get("gameID").getAsString();
             }
-            else if (response.statusCode() == 403) {
+            else if (response.statusCode() == 401) {
                 throw new Exception("Game Name Already Taken");
             }
             else{
@@ -102,7 +102,9 @@ public class ServerFacade {
         try{
             JsonObject json = new JsonObject();
             json.addProperty("gameID", gameID);
-            json.addProperty("playerColor", playerColor);
+            if (playerColor != null){
+                json.addProperty("playerColor", playerColor);
+            }
             ClientCommunicator.put(json, "/game", authToken);
         }
         catch(Exception e){

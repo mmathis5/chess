@@ -4,6 +4,7 @@ import chess.ChessGame;
 import com.google.gson.*;
 import com.sun.nio.sctp.NotificationHandler;
 import dataAccess.SQLGameDAO;
+import dataAccess.exceptions.DataAccessException;
 import model.GameData;
 import model.UserData;
 import server.Server;
@@ -175,7 +176,6 @@ public class Client {
                 Gson gson = new Gson();
                 gson.toJson(jsonElement);
                 String gameName = jsonElement.getAsJsonObject().get("gameName").toString();
-                JsonElement jsonGameData = jsonElement.getAsJsonObject().getAsJsonObject("chessGame");
                 JsonElement whiteUserJson = jsonElement.getAsJsonObject().get("whiteUsername");
                 JsonElement blackUserJson = jsonElement.getAsJsonObject().get("blackUsername");
                 String whiteUser = "none";
@@ -221,8 +221,11 @@ public class Client {
             //check if we need to get the player
             if (needsPlayer){
                 playerColor = getPlayerColor();
+                //validate that the player isn't already taken
+                if (!playerIsAvailable(number, playerColor)){
+                    throw new DataAccessException("The team you've chosen already has a user assigned to it.");
+                }
             }
-            //validate that the player isn't already taken
             JsonElement gameJsonElement = gamesListHashMap.get(Integer.valueOf(number));
             JsonObject gameJson= gameJsonElement.getAsJsonObject();
             if (Objects.equals(playerColor, "WHITE")){
@@ -243,6 +246,8 @@ public class Client {
             Gson gson2 = new Gson();
             GameData chessGame = gson2.fromJson(gameJson, GameData.class);
             ChessBoard chessBoard = chessGame.getChessBoard();
+            //reset for the sake of phase 5
+            chessBoard.resetBoard();
             //display the game board
             ChessBoardUI chessBoardUI = new ChessBoardUI(chessBoard);
             chessBoardUI.drawBoard();
@@ -253,11 +258,29 @@ public class Client {
             scanner.nextLine();
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
+            System.out.println("Try to execute the command again");
         }
     }
 
-    private boolean playerIsAvailable(){
-        return true;
+    private boolean playerIsAvailable(String number, String desiredColor){
+        JsonElement jsonElement = gamesListHashMap.get(Integer.valueOf(number));
+        JsonElement whiteUserJson = jsonElement.getAsJsonObject().get("whiteUsername");
+        JsonElement blackUserJson = jsonElement.getAsJsonObject().get("blackUsername");
+        String whiteUser = "none";
+        String blackUser = "none";
+        if (whiteUserJson != null){
+            whiteUser = whiteUserJson.toString();
+        }
+        if (blackUserJson != null){
+            blackUser = blackUserJson.toString();
+        }
+        if (Objects.equals(desiredColor, "WHITE") && Objects.equals(whiteUser, "none")){
+            return true;
+        }
+        if (Objects.equals(desiredColor, "BLACK") && Objects.equals(blackUser, "none")){
+            return true;
+        }
+        return false;
     }
 
 }

@@ -4,6 +4,7 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import dataAccess.exceptions.DataAccessException;
+import dataAccess.exceptions.GameNameTakenException;
 import model.GameData;
 import model.UserData;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.sql.SQLException;
+import java.util.Objects;
 
 
 public class SQLGameDAO implements GameDAO{
@@ -29,7 +31,7 @@ public class SQLGameDAO implements GameDAO{
             e.printStackTrace();
         }
     }
-    public Integer createGame(String authToken, String gameName){
+    public Integer createGame(String authToken, String gameName) {
         Integer gameID = (int) (Math.random() * 10000);
         try {
             GameData gameData = new GameData(gameName, gameID);
@@ -47,10 +49,12 @@ public class SQLGameDAO implements GameDAO{
             statement.close();
         } catch (SQLException e) {
             e.printStackTrace();
+            return gameID;
         }
         return gameID;
     }
-    public ArrayList<GameData> getGamesList(){
+
+        public ArrayList<GameData> getGamesList(){
         ArrayList<GameData> gamesList = new ArrayList<>();
         try {
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM games");
@@ -75,6 +79,8 @@ public class SQLGameDAO implements GameDAO{
         }
         return gamesList;
     }
+
+
     public GameData getGame(Integer gameID) throws SQLException, IOException, ClassNotFoundException {
         GameData gameData = null;
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM games WHERE gameID=?");

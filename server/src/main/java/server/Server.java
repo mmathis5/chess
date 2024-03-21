@@ -12,6 +12,7 @@ import model.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 
 public class Server {
     private static UserService userService;
@@ -184,6 +185,9 @@ public class Server {
                     throw new BadRequestException("Game name not provided");
                 }
                 String gameName =  jsonObject.get("gameName").getAsString();
+                if (!gameNameAvailable(gameName, authToken)){
+                    throw new GameNameTakenException("Game name is already taken");
+                }
                 Integer gameID = this.gameService.createGame(authToken, gameName);
                 response.status(200);
                 return new Gson().toJson(Map.of("gameID", gameID));
@@ -201,6 +205,17 @@ public class Server {
                 return new Gson().toJson(Map.of("message", "Error: description"));
             }
         });
+    }
+
+    private Boolean gameNameAvailable(String gameName, String authToken) throws InternalFailureException, DataAccessException {
+        ArrayList<GameData> allGames = this.gameService.listGames(authToken);
+        for (int i = 0; i < allGames.size(); i++) {
+            String gameNameFromList = allGames.get(i).getGameName();
+            if (Objects.equals(gameNameFromList, gameName)) {
+                throw new DataAccessException("There is already a game in play with the same name");
+            }
+        }
+        return true;
     }
     private void listGameEndpoint(){
         Spark.get("/game", (request, response) -> {
