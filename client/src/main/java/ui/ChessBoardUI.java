@@ -1,40 +1,40 @@
 package ui;
 import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
 
-import static java.lang.System.out;
 import static ui.EscapeSequences.*;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Random;
 
 public class ChessBoardUI {
     private static Boolean isWhite = true;
-    private static final int BOARD_SIZE_IN_SQUARES = 8;
+    private static final int BOARD_SIZE_IN_SQUARES = 10;
     private static final int SQUARE_SIZE_IN_CHARS = 1;
-    private static final int LINE_WIDTH_IN_CHARS = 1;
     private static final String EMPTY = " ";
-    //idk if I need these
-     private static final String X = " X ";
-    private static final String O = " O ";
-    private static Random rand = new Random();
-    private ChessBoard chessBoard;
+    private static ChessBoard chessBoard = new ChessBoard();
     ChessBoardUI(ChessBoard chessBoard){
         this.chessBoard = chessBoard;
     }
 
-//    private static void drawChessBoard(PrintStream out, ChessBoard chessBoard){
-//        for (int boardRow = 0; boardRow < BOARD_SIZE_IN_SQUARES; ++boardRow){
-//            draw
-//        }
-
+    public static void resetBoard(){
+        chessBoard.resetBoard();
+    }
     public static void main(String[] args) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+        resetBoard();
+        //normal orientation
 
         out.print(ERASE_SCREEN);
         drawHeaders(out);
+        drawChessBoard(out);
+        drawHeaders(out);
 
-        drawTicTacToeBoard(out);
-
+        out.println(1);
+        //flipped orientation
+        drawHeaders(out);
+        drawChessBoardFlipped(out);
         drawHeaders(out);
 
         out.print(SET_BG_COLOR_BLACK);
@@ -45,7 +45,7 @@ public class ChessBoardUI {
 
         setBlack(out);
 
-        String[] headers = {"a", "b", "c", "d", "e", "f", "g", "h" };
+        String[] headers = {" ", "a", "b", "c", "d", "e", "f", "g", "h", " "};
         for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
             drawHeader(out, headers[boardCol]);
 
@@ -69,58 +69,50 @@ public class ChessBoardUI {
         out.print(player);
     }
 
-    private static void drawTicTacToeBoard(PrintStream out) {
-
-        for (int boardRow = 0; boardRow < BOARD_SIZE_IN_SQUARES; ++boardRow) {
-            if (boardRow % 2 == 0){
-                isWhite = true;
-            }
-            else{
-                isWhite = false;
-            }
-            drawRowOfSquares(out);
-
-            if (boardRow < BOARD_SIZE_IN_SQUARES - 1) {
-                drawVerticalLine(out);
-                setBlack(out);
-            }
+    private static void drawChessBoard(PrintStream out) {
+        int row = 8;
+        for (int boardRow = 8; boardRow > 0; --boardRow) {
+            isWhite = boardRow % 2 == 0;
+            drawRowOfSquares(out, row);
+            row --;
+        }
+    }
+    private static void drawChessBoardFlipped(PrintStream out) {
+        int row = 1;
+        for (int boardRow = 0; boardRow < 8; ++boardRow) {
+            isWhite = boardRow % 2 == 0;
+            drawRowOfSquares(out, row);
+            row ++;
         }
     }
 
-    private static void drawRowOfSquares(PrintStream out) {
-
+    private static void drawRowOfSquares(PrintStream out, int row) {
         for (int squareRow = 0; squareRow < SQUARE_SIZE_IN_CHARS; ++squareRow) {
-            for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
+            for (int boardCol = 0; boardCol < 10; ++boardCol) {
+                //print the row labels
+                if (boardCol == 0 || boardCol == 9){
+                    out.print(SET_BG_COLOR_LIGHT_GREY);
+                    out.print(EMPTY);
+                    out.print(row);
+                    out.print(EMPTY);
+                    continue;
+                }
                 setWhite(out);
 
-                if (squareRow == SQUARE_SIZE_IN_CHARS / 2) {
-                    printSquare(out, rand.nextBoolean() ? X : O);
-                }
-                else {
-                    out.print(EMPTY.repeat(SQUARE_SIZE_IN_CHARS));
-                }
+                printSquare(out, getPiece(row, boardCol));
                 setBlack(out);
             }
-
+            out.print(SET_BG_COLOR_BLACK);
             out.println();
         }
     }
 
-    private static void drawVerticalLine(PrintStream out) {
-
-        int boardSizeInSpaces = BOARD_SIZE_IN_SQUARES * SQUARE_SIZE_IN_CHARS +
-                (BOARD_SIZE_IN_SQUARES - 1) * LINE_WIDTH_IN_CHARS;
-    }
 
     private static void setWhite(PrintStream out) {
         out.print(SET_BG_COLOR_WHITE);
         out.print(SET_TEXT_COLOR_WHITE);
     }
 
-    private static void setRed(PrintStream out) {
-        out.print(SET_BG_COLOR_RED);
-        out.print(SET_TEXT_COLOR_RED);
-    }
 
     private static void setBlack(PrintStream out) {
         out.print(SET_BG_COLOR_BLACK);
@@ -131,18 +123,53 @@ public class ChessBoardUI {
         out.print(SET_BG_COLOR_DARK_GREY);
         out.print(SET_TEXT_COLOR_BLACK);
     }
+    private static ChessPiece getPiece(int row, int column){
+        return chessBoard.getPiece(new ChessPosition(row, column));
+    }
 
-    private static void printSquare(PrintStream out, String player) {
+    private static void printSquare(PrintStream out, ChessPiece piece) {
+        //set square color
         if (isWhite()) {
             out.print(SET_BG_COLOR_WHITE);
-            out.print(SET_TEXT_COLOR_BLUE);
         }
         else{
             out.print(SET_BG_COLOR_BLACK);
             out.print(SET_TEXT_COLOR_RED);
         }
-        out.print(player);
-
+        //get piece type and color
+        if (piece != null){
+            if (piece.getTeamColor() == ChessGame.TeamColor.WHITE){
+                out.print(SET_TEXT_COLOR_BLUE);
+            }
+            else{
+                out.print(SET_TEXT_COLOR_RED);
+            }
+        }
+        //get piece type
+        String pieceString = " ";
+        if (piece != null) {
+            if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
+                pieceString = "P";
+            }
+            if (piece.getPieceType() == ChessPiece.PieceType.ROOK) {
+                pieceString = "R";
+            }
+            if (piece.getPieceType() == ChessPiece.PieceType.KNIGHT) {
+                pieceString = "N";
+            }
+            if (piece.getPieceType() == ChessPiece.PieceType.BISHOP) {
+                pieceString = "B";
+            }
+            if (piece.getPieceType() == ChessPiece.PieceType.KING) {
+                pieceString = "K";
+            }
+            if (piece.getPieceType() == ChessPiece.PieceType.QUEEN) {
+                pieceString = "Q";
+            }
+        }
+        out.print(EMPTY);
+        out.print(pieceString);
+        out.print(EMPTY);
         setWhite(out);
     }
 
