@@ -1,11 +1,10 @@
 package ui;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.Gson;
 
-import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public class ServerFacade {
@@ -83,9 +82,12 @@ public class ServerFacade {
         }
     }
 
-    public static void listGames(String authToken) throws Exception{
+    public static JsonArray listGames(String authToken) throws Exception{
         try{
             HttpResponse<String> response = ui.ClientCommunicator.get("/game", authToken);
+            JsonObject jsonObject = new Gson().fromJson(response.body(), JsonObject.class);
+            return jsonObject.get("games").getAsJsonArray();
+
         }
         catch(Exception e){
             throw e;

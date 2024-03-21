@@ -41,7 +41,7 @@ public class ClientCommunicator {
 
     public static HttpResponse<String> get(String resourcs, String authToken) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(serviceUrl + "/session"))
+                .uri(URI.create(serviceUrl + resourcs))
                 .header("authorization", authToken)
                 .GET()
                 .build();
