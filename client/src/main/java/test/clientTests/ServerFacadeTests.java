@@ -9,12 +9,14 @@ import ui.*;
 public class ServerFacadeTests {
 
     private static Server server;
+    static ServerFacade facade;
 
     @BeforeAll
     public static void init() {
         server = new Server();
         var port = server.run(8080);
         System.out.println("Started test HTTP server on " + port);
+        facade = new ServerFacade(port);
         server.clearEndpoint();
     }
 
@@ -33,7 +35,7 @@ public class ServerFacadeTests {
     @Order(1)
     @DisplayName("Successful Register")
     public void successRegister(){
-        Assertions.assertDoesNotThrow(() -> ui.ServerFacade.register("user3", "password", "email"));
+        Assertions.assertDoesNotThrow(() -> ui.ServerFacade.register("user4", "password", "email"));
     }
 
     @Test

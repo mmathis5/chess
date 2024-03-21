@@ -1,17 +1,17 @@
 package ui;
 
 import com.google.gson.JsonObject;
-import ui.ClientCommunicator;
 import com.google.gson.Gson;
 
-import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public class ServerFacade {
     static HttpClient client = HttpClient.newHttpClient();
     static String serviceUrl = "http://localhost:8080";
+    public ServerFacade(int port){
+
+    }
     public static String login(String username, String password) throws Exception {
         JsonObject json = new JsonObject();
         json.addProperty("username", username);
