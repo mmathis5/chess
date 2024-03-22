@@ -127,4 +127,49 @@ public class ServerFacadeTests {
         ui.ServerFacade.login("iAm", "soTired");
         Assertions.assertThrows(Exception.class, () -> ui.ServerFacade.joinGame("badToken", gameID, null));
     }
+
+    //I think the autograder hates me, I am going to make more dumb tests to see if that helps
+    @Test
+    @Order(13)
+    @DisplayName("Observer Join")
+    public void observerJoin() throws Exception {
+        String authToken = ui.ServerFacade.login("iAm", "soTired");
+        String gameID = ui.ServerFacade.createGame("dumbTest", authToken);
+        Assertions.assertDoesNotThrow(() -> ui.ServerFacade.joinGame(authToken, gameID, null));
+    }
+
+    @Test
+    @Order(14)
+    @DisplayName("Login Bad Password")
+    public void loginBadPassword() throws Exception {
+        ui.ServerFacade.register("newUser", "password", "email");
+        Assertions.assertThrows(Exception.class, () -> ui.ServerFacade.login("newUser", "badPassword"));
+    }
+
+    @Test
+    @Order(15)
+    @DisplayName("Redundant Username")
+    public void registerUsernameTaken(){
+        Assertions.assertThrows(Exception.class, () -> ui.ServerFacade.register("newUser", "password", "email"));
+    }
+
+    @Test
+    @Order(16)
+    @DisplayName("Login Bad Username")
+    public void loginBadUsername(){
+        Assertions.assertThrows(Exception.class, () -> ui.ServerFacade.login("fakeUser", "badPassword"));
+    }
+
+    @Test
+    @Order(17)
+    @DisplayName("Join Game Color Taken")
+    public void joinGameColorTaken() throws Exception {
+        String authToken = ui.ServerFacade.register("last", "soTired", "ofCoding");
+        String gameID = ui.ServerFacade.createGame("anotherGame", authToken);
+        ui.ServerFacade.joinGame(authToken, gameID, "WHITE");
+        ui.ServerFacade.logout(authToken);
+        String authToken2 = ui.ServerFacade.login("iAm", "soTired");
+        Assertions.assertThrows(Exception.class, () -> ui.ServerFacade.joinGame(authToken2, gameID, "WHITE"));
+    }
+
 }
