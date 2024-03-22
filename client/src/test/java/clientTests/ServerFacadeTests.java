@@ -1,4 +1,4 @@
-package test.clientTests;
+package clientTests;
 
 import dataAccess.exceptions.DataAccessException;
 import org.junit.jupiter.api.*;
