@@ -13,7 +13,7 @@ import com.google.gson.JsonObject;
 public class ClientCommunicator {
 
     static HttpClient client = HttpClient.newHttpClient();
-    static String serviceUrl = "http://localhost:8080";
+    static String serviceUrl;
     public static HttpResponse<String> postUser(JsonObject json, String resource) throws Exception{
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(serviceUrl + resource))
