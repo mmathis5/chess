@@ -23,6 +23,7 @@ public class Client {
     String authToken = null;
     String username = null;
     Scanner scanner = new Scanner(System.in);
+    ServerFacade ServerFacade = new ServerFacade(8080);
     private HashMap<Integer, JsonElement> gamesListHashMap = new HashMap<Integer, JsonElement>();
 
     public static void main(String[] args) {

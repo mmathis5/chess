@@ -21,24 +21,23 @@ public class ChessBoardUI {
     public void drawBoard(){
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
-        drawHeaders(out);
+        drawHeaders(out, new String[]{" ", "a", "b", "c", "d", "e", "f", "g", "h", " "});
         drawChessBoard(out);
-        drawHeaders(out);
+        drawHeaders(out, new String[]{" ", "a", "b", "c", "d", "e", "f", "g", "h", " "});
 
         out.println(1);
         //flipped orientation
-        drawHeaders(out);
+        drawHeaders(out, new String[]{" ", "h", "g", "f", "e", "d", "c", "b", "a", " "});
         drawChessBoardFlipped(out);
-        drawHeaders(out);
+        drawHeaders(out, new String[]{" ", "h", "g", "f", "e", "d", "c", "b", "a", " "});
 
         out.print(SET_BG_COLOR_DARK_GREY);
         out.print(SET_TEXT_COLOR_WHITE);
     }
-    private static void drawHeaders(PrintStream out) {
+    private static void drawHeaders(PrintStream out, String[] headers) {
 
         setBlack(out);
 
-        String[] headers = {" ", "a", "b", "c", "d", "e", "f", "g", "h", " "};
         for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
             drawHeader(out, headers[boardCol]);
 
@@ -49,6 +48,7 @@ public class ChessBoardUI {
 
         out.println();
     }
+
 
     private static void drawHeader(PrintStream out, String headerText) {
         out.print(SET_BG_COLOR_LIGHT_GREY);
