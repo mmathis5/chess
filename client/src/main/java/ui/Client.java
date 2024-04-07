@@ -82,8 +82,8 @@ public class Client {
             System.out.println("2. Logout");
             System.out.println("3. Create Game");
             System.out.println("4. List Games");
-            System.out.println("5. Join Game");
-            System.out.println("6. Join Observer");
+            System.out.println("5. Join a Game");
+            System.out.println("6. Join a Game As An Observer");
             System.out.println("Enter Command: ");
             String input = scanner.nextLine();
             if (Objects.equals(input, "2")) {
@@ -333,8 +333,14 @@ public class Client {
     }
 
     private void leaveGame(){
-        if (localPlayerColor == null){
+        if (localPlayerColor == null) {
+            System.out.println("\nYou have successfully exited the game you were observing. \nWelcome back to the post login menu.\n");
 
+            this.inGameplayMode = false;
+            postLogin();
+        }
+        else{
+            System.out.println("You are an active player and as such, cannot leave the game. Choose a valid command.\n");
         }
     }
 

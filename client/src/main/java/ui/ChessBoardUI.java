@@ -21,6 +21,7 @@ public class ChessBoardUI {
     public void drawBoardWhite(){
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
+        out.println("\n");
         drawHeaders(out, new String[]{" ", "a", "b", "c", "d", "e", "f", "g", "h", " "});
         drawChessBoard(out);
         drawHeaders(out, new String[]{" ", "a", "b", "c", "d", "e", "f", "g", "h", " "});
@@ -33,6 +34,7 @@ public class ChessBoardUI {
     public void drawBoardBlack(){
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
+        out.println("\n");
         drawHeaders(out, new String[]{" ", "h", "g", "f", "e", "d", "c", "b", "a", " "});
         drawChessBoardFlipped(out);
         drawHeaders(out, new String[]{" ", "h", "g", "f", "e", "d", "c", "b", "a", " "});
