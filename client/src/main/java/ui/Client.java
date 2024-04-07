@@ -20,7 +20,7 @@ import java.util.Objects;
 import java.util.Scanner;
 
 public class Client {
-    Boolean quit = false;
+    Boolean inGameplayMode = false;
     String authToken = null;
     String username = null;
     Scanner scanner = new Scanner(System.in);
@@ -41,7 +41,6 @@ public class Client {
         }
     }
 
-
     public void preLogin(){
         while (this.authToken == null) {
             System.out.println("1. Help");
@@ -57,6 +56,21 @@ public class Client {
         }
         postLogin();
     }
+
+    public void evalPreLogin(String input) {
+        try {
+            switch (input) {
+                case "1" -> helpPreLogin();
+                case "3" -> login();
+                case "4" -> register();
+                default -> System.out.println("Unknown Command Number");
+            };
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+
+
 
     public void postLogin() {
         while (this.authToken != null){
@@ -94,30 +108,48 @@ public class Client {
         }
     }
 
-    private String getPlayerColor(){
-        System.out.println("Enter 'White' or 'Black' to specify which player you wish to join");
-        return scanner.nextLine().toUpperCase();
+    public void gameplayMode(){
+        while (inGameplayMode){
+            System.out.println("Gameplay Menu:");
+            System.out.println("1. Help");
+            System.out.println("2. Redraw Chess Board");
+            System.out.println("3. Leave");
+            System.out.println("4. Make Move");
+            System.out.println("5. Resign");
+            System.out.println("6. Highlight Legal Moves");
+            System.out.println("Enter Command: ");
+            String input = scanner.nextLine();
+            evalGameplayMode(input);
+        }
     }
-    public void evalPreLogin(String input) {
+
+    public void evalGameplayMode(String input) {
         try {
             switch (input) {
-                case "1" -> helpPreLogin();
-                case "3" -> login();
-                case "4" -> register();
-                default -> System.out.println("Unknown Command Number");
+                case "1" -> helpGameplayMode();
+                case "2" -> redrawChessBoard();
+                default -> System.out.println("Command not yet implemented");
             };
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
     }
 
+    private String getPlayerColor(){
+        System.out.println("Enter 'White' or 'Black' to specify which player you wish to join");
+        return scanner.nextLine().toUpperCase();
+    }
+
     public void helpPreLogin(){
         System.out.println("Help: If you have a user account, enter 3 to log in. If not, enter 4 to register.");
     }
     public void helpPostLogin(){
-        System.out.println("Help: Type a number to execute a command in game mode");
+        System.out.println("Help: Type a number to create, view, or join a game");
     }
 
+    public void helpGameplayMode(){
+        System.out.println("Help: Type a number to execute a command in game mode");
+    }
     public void login(){
         try{
             System.out.println("Enter Username:");
@@ -253,18 +285,13 @@ public class Client {
             //display the game board
             ChessBoardUI chessBoardUI = new ChessBoardUI(chessBoard);
             chessBoardUI.drawBoard();
-
-
-
-            System.out.println("Type anything to view the Gameplay Menu;");
-            scanner.nextLine();
+            this.inGameplayMode = true;
+            gameplayMode();
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
             System.out.println("Try to execute the command again\n");
         }
     }
-
-
     private boolean playerIsAvailable(String number, String desiredColor){
         JsonElement jsonElement = gamesListHashMap.get(Integer.valueOf(number));
         JsonElement whiteUserJson = jsonElement.getAsJsonObject().get("whiteUsername");
@@ -284,6 +311,10 @@ public class Client {
             return true;
         }
         return false;
+    }
+
+    private void redrawChessBoard(){
+
     }
 
 }
