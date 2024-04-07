@@ -20,10 +20,11 @@ import java.util.Objects;
 import java.util.Scanner;
 
 public class Client {
+    Boolean quit = false;
     String authToken = null;
     String username = null;
     Scanner scanner = new Scanner(System.in);
-    ServerFacade ServerFacade = new ServerFacade(8080);
+    static ServerFacade serverFacade = new ServerFacade(8080);
     private HashMap<Integer, JsonElement> gamesListHashMap = new HashMap<Integer, JsonElement>();
 
     public static void main(String[] args) {
@@ -50,7 +51,7 @@ public class Client {
             System.out.println("Enter Command: ");
             String input = scanner.nextLine();
             if (Objects.equals(input, "2")) {
-                break;
+                return;
             }
             evalPreLogin(input);
         }
@@ -123,7 +124,7 @@ public class Client {
             String username = scanner.nextLine();
             System.out.println("Enter Password:");
             String password = scanner.nextLine();
-            this.authToken = ServerFacade.login(username, password);
+            this.authToken = serverFacade.login(username, password);
             this.username = username;
         }catch (Exception e){
             System.out.println(e.getMessage());
@@ -137,7 +138,7 @@ public class Client {
             String password = scanner.nextLine();
             System.out.println("Enter Email: ");
             String email = scanner.nextLine();
-            this.authToken = ServerFacade.register(username, password, email);
+            this.authToken = serverFacade.register(username, password, email);
         }catch (Exception e){
             System.out.println("Error: " + e.getMessage());
         }
@@ -145,7 +146,7 @@ public class Client {
 
     public void logout(){
         try{
-            ServerFacade.logout(this.authToken);
+            serverFacade.logout(this.authToken);
             this.authToken = null;
         }
         catch (Exception e){
@@ -157,7 +158,7 @@ public class Client {
         System.out.println("Enter Game Name: ");
         String gameName = scanner.nextLine();
         try{
-            String gameID = ServerFacade.createGame(gameName, this.authToken);
+            String gameID = serverFacade.createGame(gameName, this.authToken);
             System.out.println("The game was created successfully!\n");
         }
         catch (Exception e){
@@ -167,7 +168,7 @@ public class Client {
     }
     public void listGames(){
         try{
-            JsonArray jsonList = ui.ServerFacade.listGames(this.authToken);
+            JsonArray jsonList = serverFacade.listGames(this.authToken);
             gamesListHashMap.clear();
             System.out.println("List of Games:");
             for (int number = 1; number < jsonList.size() + 1; number++){
@@ -239,7 +240,7 @@ public class Client {
             //using the number, get the gameID
             String gameID = gameJson.getAsJsonObject().get("gameID").toString();
             //make the http call
-            ServerFacade.joinGame(this.authToken, gameID, playerColor);
+            serverFacade.joinGame(this.authToken, gameID, playerColor);
             //update the hashMap
 
 
@@ -262,6 +263,7 @@ public class Client {
             System.out.println("Try to execute the command again\n");
         }
     }
+
 
     private boolean playerIsAvailable(String number, String desiredColor){
         JsonElement jsonElement = gamesListHashMap.get(Integer.valueOf(number));
