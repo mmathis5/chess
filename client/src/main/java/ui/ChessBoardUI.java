@@ -18,15 +18,21 @@ public class ChessBoardUI {
         this.chessBoard = chessBoard;
     }
 
-    public void drawBoard(){
+    public void drawBoardWhite(){
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         drawHeaders(out, new String[]{" ", "a", "b", "c", "d", "e", "f", "g", "h", " "});
         drawChessBoard(out);
         drawHeaders(out, new String[]{" ", "a", "b", "c", "d", "e", "f", "g", "h", " "});
 
-        out.println(1);
-        //flipped orientation
+
+        out.print(SET_BG_COLOR_DARK_GREY);
+        out.print(SET_TEXT_COLOR_WHITE);
+    }
+
+    public void drawBoardBlack(){
+        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+
         drawHeaders(out, new String[]{" ", "h", "g", "f", "e", "d", "c", "b", "a", " "});
         drawChessBoardFlipped(out);
         drawHeaders(out, new String[]{" ", "h", "g", "f", "e", "d", "c", "b", "a", " "});

@@ -20,9 +20,10 @@ import java.util.Objects;
 import java.util.Scanner;
 
 public class Client {
+    ChessBoardUI chessBoardUI = new ChessBoardUI(new ChessBoard());
     Boolean inGameplayMode = false;
     String localPlayerColor = null;
-    JsonObject localGame = null;
+    ChessBoard localGame = null;
     String authToken = null;
     String username = null;
     Scanner scanner = new Scanner(System.in);
@@ -130,6 +131,7 @@ public class Client {
             switch (input) {
                 case "1" -> helpGameplayMode();
                 case "2" -> redrawChessBoard();
+                case "3" -> leaveGame();
                 default -> System.out.println("Command not yet implemented");
             };
         } catch (Exception ex) {
@@ -283,13 +285,12 @@ public class Client {
             //get the game board
             Gson gson2 = new Gson();
             GameData chessGame = gson2.fromJson(gameJson, GameData.class);
-            ChessBoard chessBoard = chessGame.getChessBoard();
-            //reset for the sake of phase 5
-            chessBoard.resetBoard();
-            //display the game board
-            ChessBoardUI chessBoardUI = new ChessBoardUI(chessBoard);
-            chessBoardUI.drawBoard();
+            this.localGame = chessGame.getChessBoard();
             this.inGameplayMode = true;
+            this.chessBoardUI = new ChessBoardUI(this.localGame);
+            drawBoardProperOrientation();
+
+
             gameplayMode();
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
@@ -317,13 +318,23 @@ public class Client {
         return false;
     }
 
-    private void redrawChessBoard(){
+    private void drawBoardProperOrientation(){
         if (Objects.equals(this.localPlayerColor, "WHITE") || this.localPlayerColor == null){
-            //the game needs to be stored in a local object
-            //print it with white at the bottom
+            //print with white at the bottom
+            this.chessBoardUI.drawBoardWhite();
         }
         else{
             //print it with black at the bottom
+            this.chessBoardUI.drawBoardWhite();
+        }
+    }
+    private void redrawChessBoard(){
+        drawBoardProperOrientation();
+    }
+
+    private void leaveGame(){
+        if (localPlayerColor == null){
+
         }
     }
 
