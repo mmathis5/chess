@@ -21,6 +21,8 @@ import java.util.Scanner;
 
 public class Client {
     Boolean inGameplayMode = false;
+    String localPlayerColor = null;
+    JsonObject localGame = null;
     String authToken = null;
     String username = null;
     Scanner scanner = new Scanner(System.in);
@@ -264,9 +266,11 @@ public class Client {
             JsonObject gameJson= gameJsonElement.getAsJsonObject();
             if (Objects.equals(playerColor, "WHITE")){
                 gameJson.add("whiteUsername", new JsonPrimitive(username));
+                this.localPlayerColor = "WHITE";
             }
             if (Objects.equals(playerColor, "BLACK")){
                 gameJson.add("blackUsername", new JsonPrimitive(username));
+                this.localPlayerColor = "BLACK";
             }
             updateHashMapValue(Integer.valueOf(number), gameJson);
             //using the number, get the gameID
@@ -314,7 +318,13 @@ public class Client {
     }
 
     private void redrawChessBoard(){
-
+        if (Objects.equals(this.localPlayerColor, "WHITE") || this.localPlayerColor == null){
+            //the game needs to be stored in a local object
+            //print it with white at the bottom
+        }
+        else{
+            //print it with black at the bottom
+        }
     }
 
 }
