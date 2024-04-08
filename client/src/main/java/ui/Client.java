@@ -1,35 +1,33 @@
 package ui;
 import chess.ChessBoard;
-import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
+import chess.ChessPiece;
 import com.google.gson.*;
-import com.sun.nio.sctp.NotificationHandler;
-import dataAccess.SQLGameDAO;
 import dataAccess.exceptions.DataAccessException;
 import model.GameData;
-import model.UserData;
 import server.Server;
-import ui.ChessBoardUI;
-import ui.ServerFacade;
-import ui.ClientCommunicator;
 
-import java.io.Console;
-import java.net.http.HttpResponse;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 
-public class Client {
+public class Client implements ServerMessageObserver {
     ChessBoardUI chessBoardUI = new ChessBoardUI(new ChessBoard());
     Boolean inGameplayMode = false;
     String localPlayerColor = null;
-    ChessBoard localGame = null;
+    ChessBoard localGameBoard = null;
     String authToken = null;
     String username = null;
     Scanner scanner = new Scanner(System.in);
-    static ServerFacade serverFacade = new ServerFacade(8080);
+    private ServerFacade serverFacade;
     private HashMap<Integer, JsonElement> gamesListHashMap = new HashMap<Integer, JsonElement>();
 
+    public void Client(){
+        this.serverFacade = new ServerFacade(8080, this);
+    }
+
+    public void onMessage(String msg){
+
+    }
     public static void main(String[] args) {
         Server server = new Server();
         var port = server.run(8080);
@@ -132,6 +130,7 @@ public class Client {
                 case "1" -> helpGameplayMode();
                 case "2" -> redrawChessBoard();
                 case "3" -> leaveGame();
+                case "6" -> highlightLegalMoves();
                 default -> System.out.println("Command not yet implemented");
             };
         } catch (Exception ex) {
@@ -239,22 +238,36 @@ public class Client {
     }
 
 
+    public void isValidGame(String number){
+        boolean validGame = false;
+        while (!validGame) {
+            JsonElement gameJson = gamesListHashMap.get(Integer.valueOf(number));
+            if (gameJson == null){
+                System.out.println("You have chosen an invalid game number. Enter a new valid number: ");
+                number = scanner.nextLine();
+            }
+            else {
+                validGame = true;
+            }
+        }
+    }
     public void joinGame(boolean needsPlayer) {
         try {
             listGames();
             System.out.println("Enter the number of the game you wish to join: ");
             String number = scanner.nextLine();
-            boolean validGame = false;
-            while (!validGame) {
-                JsonElement gameJson = gamesListHashMap.get(Integer.valueOf(number));
-                if (gameJson == null){
-                    System.out.println("You have chosen an invalid game number. Enter a new valid number: ");
-                    number = scanner.nextLine();
-                }
-                else {
-                    validGame = true;
-                }
-            }
+//            boolean validGame = false;
+//            while (!validGame) {
+//                JsonElement gameJson = gamesListHashMap.get(Integer.valueOf(number));
+//                if (gameJson == null){
+//                    System.out.println("You have chosen an invalid game number. Enter a new valid number: ");
+//                    number = scanner.nextLine();
+//                }
+//                else {
+//                    validGame = true;
+//                }
+//            }
+            isValidGame(number);
             String playerColor = null;
             //check if we need to get the player
             if (needsPlayer){
@@ -264,8 +277,7 @@ public class Client {
                     throw new DataAccessException("The team you've chosen already has a user assigned to it.");
                 }
             }
-            JsonElement gameJsonElement = gamesListHashMap.get(Integer.valueOf(number));
-            JsonObject gameJson= gameJsonElement.getAsJsonObject();
+            JsonObject gameJson = gamesListHashMap.get(Integer.valueOf(number)).getAsJsonObject();
             if (Objects.equals(playerColor, "WHITE")){
                 gameJson.add("whiteUsername", new JsonPrimitive(username));
                 this.localPlayerColor = "WHITE";
@@ -285,9 +297,9 @@ public class Client {
             //get the game board
             Gson gson2 = new Gson();
             GameData chessGame = gson2.fromJson(gameJson, GameData.class);
-            this.localGame = chessGame.getChessBoard();
+            this.localGameBoard = chessGame.getChessBoard();
             this.inGameplayMode = true;
-            this.chessBoardUI = new ChessBoardUI(this.localGame);
+            this.chessBoardUI = new ChessBoardUI(this.localGameBoard);
             drawBoardProperOrientation();
 
 
@@ -325,7 +337,7 @@ public class Client {
         }
         else{
             //print it with black at the bottom
-            this.chessBoardUI.drawBoardWhite();
+            this.chessBoardUI.drawBoardBlack();
         }
     }
     private void redrawChessBoard(){
@@ -344,4 +356,24 @@ public class Client {
         }
     }
 
+    private void highlightLegalMoves(){
+        //initialize a hash map to get the coordinates in numeric form
+        HashMap<String, Integer> letterToNumber = new HashMap<String, Integer>();
+        letterToNumber.put("a", 1);
+        letterToNumber.put("b", 2);
+        letterToNumber.put("c", 3);
+        letterToNumber.put("d", 4);
+        letterToNumber.put("e", 5);
+        letterToNumber.put("f", 6);
+        letterToNumber.put("g", 7);
+        letterToNumber.put("h", 8);
+        //query the client for the piece it wishes to see the moves for
+        System.out.println("What is the letter coordinate of the piece you wish to see legal moves for?");
+        Integer letterCor = letterToNumber.get(scanner.nextLine().toLowerCase());
+        System.out.println("What is the number coordinate of the piece you wish to see legal moves for?");
+        Integer numberCor = Integer.parseInt(scanner.nextLine());
+        ChessPiece currPiece = localGameBoard.getPiece(new ChessPosition(letterCor, numberCor));
+        Collection<ChessMove> possibleMoves =currPiece.pieceMoves(localGameBoard, new ChessPosition(letterCor, numberCor));
+        System.out.println(currPiece.getPieceType());
+    }
 }

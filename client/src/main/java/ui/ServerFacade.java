@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.Gson;
 import dataAccess.SQLGameDAO;
 import dataAccess.exceptions.DataAccessException;
+import server.Server;
 
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
@@ -12,9 +13,15 @@ import java.net.http.HttpResponse;
 public class ServerFacade {
     static HttpClient client = HttpClient.newHttpClient();
     static String serviceUrl;
+    ServerMessageObserver observer;
     public ServerFacade(int port){
         serviceUrl = "http://localhost:" + port;
         ClientCommunicator.serviceUrl = serviceUrl;
+    }
+    public ServerFacade(int port, ServerMessageObserver observer){
+        serviceUrl = "http://localhost:" + port;
+        ClientCommunicator.serviceUrl = serviceUrl;
+        this.observer = observer;
     }
     public static String login(String username, String password) throws Exception {
         JsonObject json = new JsonObject();
