@@ -11,17 +11,18 @@ import server.Server;
 import java.util.*;
 
 public class Client implements ServerMessageObserver {
-    ChessBoardUI chessBoardUI = new ChessBoardUI(new ChessBoard());
+    ChessBoardUI chessBoardUI = new ChessBoardUI();
     Boolean inGameplayMode = false;
     String localPlayerColor = null;
     ChessBoard localGameBoard = null;
     String authToken = null;
     String username = null;
+    JsonArray jsonOfGames;
     Scanner scanner = new Scanner(System.in);
     private ServerFacade serverFacade;
     private HashMap<Integer, JsonElement> gamesListHashMap = new HashMap<Integer, JsonElement>();
 
-    public void Client(){
+    public Client(){
         this.serverFacade = new ServerFacade(8080, this);
     }
 
@@ -75,7 +76,7 @@ public class Client implements ServerMessageObserver {
 
     public void postLogin() {
         while (this.authToken != null){
-            System.out.println("Gameplay Menu:");
+            System.out.println("Post Login Menu:");
             System.out.println("1. Help");
             System.out.println("2. Logout");
             System.out.println("3. Create Game");
@@ -128,7 +129,7 @@ public class Client implements ServerMessageObserver {
         try {
             switch (input) {
                 case "1" -> helpGameplayMode();
-                case "2" -> redrawChessBoard();
+                //case "2" -> redrawChessBoard();
                 case "3" -> leaveGame();
                 case "6" -> highlightLegalMoves();
                 default -> System.out.println("Command not yet implemented");
@@ -173,6 +174,7 @@ public class Client implements ServerMessageObserver {
             String password = scanner.nextLine();
             System.out.println("Enter Email: ");
             String email = scanner.nextLine();
+            this.username = username;
             this.authToken = serverFacade.register(username, password, email);
         }catch (Exception e){
             System.out.println("Error: " + e.getMessage());
@@ -201,13 +203,22 @@ public class Client implements ServerMessageObserver {
         }
 
     }
+
+    public void getGamesJson(){
+        try{
+            this.jsonOfGames = serverFacade.listGames(this.authToken);
+        }
+        catch(Exception e){
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
     public void listGames(){
         try{
-            JsonArray jsonList = serverFacade.listGames(this.authToken);
+            getGamesJson();
             gamesListHashMap.clear();
             System.out.println("List of Games:");
-            for (int number = 1; number < jsonList.size() + 1; number++){
-                JsonElement jsonElement = jsonList.get(number -1);
+            for (int number = 1; number < this.jsonOfGames.size() + 1; number++){
+                JsonElement jsonElement = this.jsonOfGames.get(number -1);
                 //add into the hashMap
                 updateHashMapValue(number, jsonElement);
                 Gson gson = new Gson();
@@ -253,20 +264,13 @@ public class Client implements ServerMessageObserver {
     }
     public void joinGame(boolean needsPlayer) {
         try {
+            getGamesJson();
+            if (this.jsonOfGames.isEmpty()){
+                throw new DataAccessException("There are no created games for you to choose from. Create a game, then try again.");
+            }
             listGames();
             System.out.println("Enter the number of the game you wish to join: ");
             String number = scanner.nextLine();
-//            boolean validGame = false;
-//            while (!validGame) {
-//                JsonElement gameJson = gamesListHashMap.get(Integer.valueOf(number));
-//                if (gameJson == null){
-//                    System.out.println("You have chosen an invalid game number. Enter a new valid number: ");
-//                    number = scanner.nextLine();
-//                }
-//                else {
-//                    validGame = true;
-//                }
-//            }
             isValidGame(number);
             String playerColor = null;
             //check if we need to get the player
@@ -274,7 +278,7 @@ public class Client implements ServerMessageObserver {
                 playerColor = getPlayerColor();
                 //validate that the player isn't already taken
                 if (!playerIsAvailable(number, playerColor)){
-                    throw new DataAccessException("The team you've chosen already has a user assigned to it.");
+                    throw new DataAccessException("The team you've chosen already has a user assigned to it.\nTry to execute the command again");
                 }
             }
             JsonObject gameJson = gamesListHashMap.get(Integer.valueOf(number)).getAsJsonObject();
@@ -291,46 +295,38 @@ public class Client implements ServerMessageObserver {
             String gameID = gameJson.getAsJsonObject().get("gameID").toString();
             //make the http call
             serverFacade.joinGame(this.authToken, gameID, playerColor);
+            getGamesJson();
             //update the hashMap
 
 
             //get the game board
             Gson gson2 = new Gson();
             GameData chessGame = gson2.fromJson(gameJson, GameData.class);
-            this.localGameBoard = chessGame.getChessBoard();
             this.inGameplayMode = true;
-            this.chessBoardUI = new ChessBoardUI(this.localGameBoard);
-            drawBoardProperOrientation();
+            this.chessBoardUI.setChessBoard(chessGame.getChessBoard());
+            drawBoardProperOrientation(chessGame.getChessBoard());
 
 
             gameplayMode();
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
-            System.out.println("Try to execute the command again\n");
         }
     }
     private boolean playerIsAvailable(String number, String desiredColor){
         JsonElement jsonElement = gamesListHashMap.get(Integer.valueOf(number));
-        JsonElement whiteUserJson = jsonElement.getAsJsonObject().get("whiteUsername");
-        JsonElement blackUserJson = jsonElement.getAsJsonObject().get("blackUsername");
-        String whiteUser = "none";
-        String blackUser = "none";
-        if (whiteUserJson != null){
-            whiteUser = whiteUserJson.toString();
+        if (Objects.equals(desiredColor, "WHITE")){
+            JsonElement whiteUserJson = jsonElement.getAsJsonObject().get("whiteUsername");
+            return whiteUserJson == null;
         }
-        if (blackUserJson != null){
-            blackUser = blackUserJson.toString();
-        }
-        if (Objects.equals(desiredColor, "WHITE") && Objects.equals(whiteUser, "none")){
-            return true;
-        }
-        if (Objects.equals(desiredColor, "BLACK") && Objects.equals(blackUser, "none")){
-            return true;
+        else if (Objects.equals(desiredColor, "BLACK")){
+            JsonElement blackUserJson = jsonElement.getAsJsonObject().get("blackUsername");
+            return blackUserJson == null;
         }
         return false;
     }
 
-    private void drawBoardProperOrientation(){
+    private void drawBoardProperOrientation(ChessBoard chessBoard){
+        this.chessBoardUI.setChessBoard(chessBoard);
         if (Objects.equals(this.localPlayerColor, "WHITE") || this.localPlayerColor == null){
             //print with white at the bottom
             this.chessBoardUI.drawBoardWhite();
@@ -340,9 +336,10 @@ public class Client implements ServerMessageObserver {
             this.chessBoardUI.drawBoardBlack();
         }
     }
-    private void redrawChessBoard(){
-        drawBoardProperOrientation();
-    }
+
+//    private void redrawChessBoard(){
+//        drawBoardProperOrientation();
+//    }
 
     private void leaveGame(){
         if (localPlayerColor == null) {

@@ -14,11 +14,16 @@ public class ChessBoardUI {
     private static final int SQUARE_SIZE_IN_CHARS = 1;
     private static final String EMPTY = " ";
     private static ChessBoard chessBoard = new ChessBoard();
-    ChessBoardUI(ChessBoard chessBoard){
+    ChessBoardUI(){}
+
+    public void setChessBoard(ChessBoard chessBoard){
         this.chessBoard = chessBoard;
     }
 
     public void drawBoardWhite(){
+        //before the board is ever printed, it makes a call to the SQL database to update the board
+
+
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.println("\n");
