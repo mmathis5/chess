@@ -1,5 +1,6 @@
 package dataAccess;
 
+import chess.ChessBoard;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -92,11 +93,7 @@ public class SQLGameDAO implements GameDAO{
             String blackUser = resultSet.getString("blackUsername");
             String game = resultSet.getString("game");
             Gson gson = new Gson();
-            ChessGame chessGame = gson.fromJson(game, ChessGame.class);
-            gameData = new GameData(gameName, gameID);
-            gameData.setWhiteUser(whiteUser);
-            gameData.setBlackUser(blackUser);
-            gameData.setChessGame(chessGame);
+            gameData = gson.fromJson(game, GameData.class);
         }
         return gameData;
     }
