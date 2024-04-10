@@ -8,8 +8,6 @@ import com.google.gson.*;
 import model.GameData;
 //import server.Server;
 import ui.DrawingChessBoard.ChessBoardUI;
-
-import java.net.http.WebSocket;
 import java.util.*;
 
 public class Client implements ServerMessageObserver {
@@ -21,8 +19,9 @@ public class Client implements ServerMessageObserver {
     Integer gameNumber;
     JsonArray jsonOfGames;
     Scanner scanner = new Scanner(System.in);
-
     private ServerFacade serverFacade;
+    private client.websocket.WebSocketFacade ws;
+
     private HashMap<Integer, JsonElement> gamesListHashMap = new HashMap<Integer, JsonElement>();
 
     public Client() {
