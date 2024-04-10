@@ -21,7 +21,7 @@ public class ChessBoardUI {
     private static Boolean highlightThisSquare = false;
     private static ChessPosition startingPosition;
     private static Boolean isStartingPosition = false;
-    ChessBoardUI(){}
+    //ChessBoardUI(){}
 
     public void setChessBoard(ChessBoard chessBoard){
         this.chessBoard = chessBoard;

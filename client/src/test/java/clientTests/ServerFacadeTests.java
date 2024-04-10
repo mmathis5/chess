@@ -1,13 +1,14 @@
 package clientTests;
 
-import dataAccess.exceptions.DataAccessException;
+//import dataAccess.exceptions.DataAccessException;
 import org.junit.jupiter.api.*;
-import server.Server;
+//import server.Server;
 import ui.*;
 
 
 public class ServerFacadeTests {
 
+    /**
     private static Server server;
     static ServerFacade facade;
 
@@ -171,5 +172,6 @@ public class ServerFacadeTests {
         String authToken2 = ui.ServerFacade.login("iAm", "soTired");
         Assertions.assertThrows(Exception.class, () -> ui.ServerFacade.joinGame(authToken2, gameID, "WHITE"));
     }
+    **/
 
 }

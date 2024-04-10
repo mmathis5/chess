@@ -4,9 +4,9 @@ import chess.ChessMove;
 import chess.ChessPosition;
 import chess.ChessPiece;
 import com.google.gson.*;
-import dataAccess.exceptions.DataAccessException;
+//import dataAccess.exceptions.DataAccessException;
 import model.GameData;
-import server.Server;
+//import server.Server;
 import model.GameData;
 
 import java.util.*;
@@ -30,19 +30,6 @@ public class Client implements ServerMessageObserver {
 
     public void onMessage(String msg){
 
-    }
-    public static void main(String[] args) {
-        Server server = new Server();
-        var port = server.run(8080);
-        System.out.println("Started test HTTP server on " + port);
-
-        Client client = new Client();
-        try {
-            client.preLogin();
-        }
-        finally {
-            server.stop();
-        }
     }
 
     public void preLogin(){
@@ -268,7 +255,7 @@ public class Client implements ServerMessageObserver {
         try {
             getGamesJson();
             if (this.jsonOfGames.isEmpty()){
-                throw new DataAccessException("There are no created games for you to choose from. Create a game, then try again.");
+                throw new Exception("There are no created games for you to choose from. Create a game, then try again.");
             }
             listGames();
             System.out.println("Enter the number of the game you wish to join: ");
@@ -281,7 +268,7 @@ public class Client implements ServerMessageObserver {
                 playerColor = getPlayerColor();
                 //validate that the player isn't already taken
                 if (!playerIsAvailable(number, playerColor)){
-                    throw new DataAccessException("The team you've chosen already has a user assigned to it.\nTry to execute the command again");
+                    throw new Exception("The team you've chosen already has a user assigned to it.\nTry to execute the command again");
                 }
             }
             JsonObject gameJson = gamesListHashMap.get(Integer.valueOf(number)).getAsJsonObject();

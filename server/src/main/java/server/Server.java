@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import dataAccess.exceptions.*;
+import org.eclipse.jetty.websocket.api.Session;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import spark.*;
 import service.*;
 import dataAccess.*;
@@ -21,33 +23,9 @@ public class Server {
 
     private final UserDAO userDAO;
 
-//    {
-//        try {
-//            userDAO = new SQLUserDAO();
-//        } catch (DataAccessException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-
     private final AuthDAO authDAO;
 
-//    {
-//        try {
-//            authDAO = new SQLAuthDAO();
-//        } catch (DataAccessException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-
     private final GameDAO gameDAO;
-
-//    {
-//        try {
-//            gameDAO = new SQLGameDAO();
-//        } catch (DataAccessException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
 
     public Server(){
         try {
@@ -284,6 +262,8 @@ public class Server {
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");
 
+        Spark.webSocket("/connect", WSServer.class);
+
         clearEndpoint();
         registerEndpoint();
         loginEndpoint();
@@ -301,10 +281,10 @@ public class Server {
         Spark.awaitStop();
     }
 
-    public static void main(String[] args) throws SQLException, DataAccessException {
-        Server server = new Server();
-        server.run(8080);
-        WSServer wSServer = new WSServer();
-        wSServer.run(8081);
+    @OnWebSocketMessage
+    public void onMessage(Session session, String message) throws Exception {
+        System.out.printf("Received: %s", message);
+        session.getRemote().sendString("WebSocket response: " + message);
     }
+
 }

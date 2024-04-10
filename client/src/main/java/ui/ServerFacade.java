@@ -3,9 +3,6 @@ package ui;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.Gson;
-import dataAccess.SQLGameDAO;
-import dataAccess.exceptions.DataAccessException;
-import server.Server;
 
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
@@ -116,7 +113,7 @@ public class ServerFacade {
             }
             HttpResponse response = ClientCommunicator.put(json, "/game", authToken);
             if (response.statusCode() != 200){
-                throw new DataAccessException("Something went wrong while you were joining");
+                throw new Exception("Something went wrong while you were joining");
             }
         }
         catch(Exception e){
