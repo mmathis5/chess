@@ -9,6 +9,7 @@ import model.GameData;
 //import server.Server;
 import ui.DrawingChessBoard.ChessBoardUI;
 
+import java.net.http.WebSocket;
 import java.util.*;
 
 public class Client implements ServerMessageObserver {
@@ -24,15 +25,15 @@ public class Client implements ServerMessageObserver {
     private ServerFacade serverFacade;
     private HashMap<Integer, JsonElement> gamesListHashMap = new HashMap<Integer, JsonElement>();
 
-    public Client(){
+    public Client() {
         this.serverFacade = new ServerFacade(8080, this);
     }
 
-    public void onMessage(String msg){
+    public void onMessage(String msg) {
 
     }
 
-    public void preLogin(){
+    public void preLogin() {
         while (this.authToken == null) {
             System.out.println("1. Help");
             System.out.println("2. Quit");
@@ -55,16 +56,16 @@ public class Client implements ServerMessageObserver {
                 case "3" -> login();
                 case "4" -> register();
                 default -> System.out.println("Unknown Command Number");
-            };
+            }
+            ;
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
     }
 
 
-
     public void postLogin() {
-        while (this.authToken != null){
+        while (this.authToken != null) {
             System.out.println("Post Login Menu:");
             System.out.println("1. Help");
             System.out.println("2. Logout");
@@ -93,14 +94,15 @@ public class Client implements ServerMessageObserver {
                 case "5" -> joinGame(true);
                 case "6" -> joinGame(false);
                 default -> System.out.println("Unknown Command Number");
-            };
+            }
+            ;
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
     }
 
-    public void gameplayMode(){
-        while (inGameplayMode){
+    public void gameplayMode() {
+        while (inGameplayMode) {
             System.out.println("Gameplay Menu:");
             System.out.println("1. Help");
             System.out.println("2. Redraw Chess Board");
@@ -120,43 +122,49 @@ public class Client implements ServerMessageObserver {
                 case "1" -> helpGameplayMode();
                 case "2" -> redrawChessBoard();
                 case "3" -> leaveGame();
+                case "4" -> makeMove();
+                case "5" -> resign();
                 case "6" -> highlightLegalMoves();
                 default -> System.out.println("Command not yet implemented");
-            };
+            }
+            ;
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
     }
 
-    private String getPlayerColor(){
+    private String getPlayerColor() {
         System.out.println("Enter 'White' or 'Black' to specify which player you wish to join");
         return scanner.nextLine().toUpperCase();
     }
 
-    public void helpPreLogin(){
+    public void helpPreLogin() {
         System.out.println("Help: If you have a user account, enter 3 to log in. If not, enter 4 to register.");
     }
-    public void helpPostLogin(){
+
+    public void helpPostLogin() {
         System.out.println("Help: Type a number to create, view, or join a game");
     }
 
-    public void helpGameplayMode(){
+    public void helpGameplayMode() {
         System.out.println("Help: Type a number to execute a command in game mode");
     }
-    public void login(){
-        try{
+
+    public void login() {
+        try {
             System.out.println("Enter Username:");
             String username = scanner.nextLine();
             System.out.println("Enter Password:");
             String password = scanner.nextLine();
             this.authToken = serverFacade.login(username, password);
             this.username = username;
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
-    public void register(){
-        try{
+
+    public void register() {
+        try {
             System.out.println("Enter Username:");
             String username = scanner.nextLine();
             System.out.println("Enter Password:");
@@ -165,49 +173,48 @@ public class Client implements ServerMessageObserver {
             String email = scanner.nextLine();
             this.username = username;
             this.authToken = serverFacade.register(username, password, email);
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
 
-    public void logout(){
-        try{
+    public void logout() {
+        try {
             serverFacade.logout(this.authToken);
             this.authToken = null;
-        }
-        catch (Exception e){
-            System.out.println("Error: "+ e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
         }
 
     }
-    public void createGame(){
+
+    public void createGame() {
         System.out.println("Enter Game Name: ");
         String gameName = scanner.nextLine();
-        try{
+        try {
             String gameID = serverFacade.createGame(gameName, this.authToken);
             System.out.println("The game was created successfully!\n");
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
 
     }
 
-    public void getGamesJson(){
-        try{
+    public void getGamesJson() {
+        try {
             this.jsonOfGames = serverFacade.listGames(this.authToken);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
-    public void listGames(){
-        try{
+
+    public void listGames() {
+        try {
             getGamesJson();
             gamesListHashMap.clear();
             System.out.println("List of Games:");
-            for (int number = 1; number < this.jsonOfGames.size() + 1; number++){
-                JsonElement jsonElement = this.jsonOfGames.get(number -1);
+            for (int number = 1; number < this.jsonOfGames.size() + 1; number++) {
+                JsonElement jsonElement = this.jsonOfGames.get(number - 1);
                 //add into the hashMap
                 updateHashMapValue(number, jsonElement);
                 Gson gson = new Gson();
@@ -217,44 +224,43 @@ public class Client implements ServerMessageObserver {
                 JsonElement blackUserJson = jsonElement.getAsJsonObject().get("blackUsername");
                 String whiteUser = "none";
                 String blackUser = "none";
-                if (whiteUserJson != null){
+                if (whiteUserJson != null) {
                     whiteUser = whiteUserJson.toString();
                 }
-                if (blackUserJson != null){
+                if (blackUserJson != null) {
                     blackUser = blackUserJson.toString();
                 }
                 System.out.println(number + ".  " + "GameID = " + gameName + "  White User: " + whiteUser + "   BlackUser: " + blackUser);
             }
             System.out.println();
 
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
 
-    private void updateHashMapValue(Integer number, JsonElement jsonElement){
+    private void updateHashMapValue(Integer number, JsonElement jsonElement) {
         gamesListHashMap.put(number, jsonElement);
     }
 
 
-    public void isValidGame(String number){
+    public void isValidGame(String number) {
         boolean validGame = false;
         while (!validGame) {
             JsonElement gameJson = gamesListHashMap.get(Integer.valueOf(number));
-            if (gameJson == null){
+            if (gameJson == null) {
                 System.out.println("You have chosen an invalid game number. Enter a new valid number: ");
                 number = scanner.nextLine();
-            }
-            else {
+            } else {
                 validGame = true;
             }
         }
     }
+
     public void joinGame(boolean needsPlayer) {
         try {
             getGamesJson();
-            if (this.jsonOfGames.isEmpty()){
+            if (this.jsonOfGames.isEmpty()) {
                 throw new Exception("There are no created games for you to choose from. Create a game, then try again.");
             }
             listGames();
@@ -264,19 +270,19 @@ public class Client implements ServerMessageObserver {
             isValidGame(number);
             String playerColor = null;
             //check if we need to get the player
-            if (needsPlayer){
+            if (needsPlayer) {
                 playerColor = getPlayerColor();
                 //validate that the player isn't already taken
-                if (!playerIsAvailable(number, playerColor)){
+                if (!playerIsAvailable(number, playerColor)) {
                     throw new Exception("The team you've chosen already has a user assigned to it.\nTry to execute the command again");
                 }
             }
             JsonObject gameJson = gamesListHashMap.get(Integer.valueOf(number)).getAsJsonObject();
-            if (Objects.equals(playerColor, "WHITE")){
+            if (Objects.equals(playerColor, "WHITE")) {
                 gameJson.add("whiteUsername", new JsonPrimitive(username));
                 this.localPlayerColor = "WHITE";
             }
-            if (Objects.equals(playerColor, "BLACK")){
+            if (Objects.equals(playerColor, "BLACK")) {
                 gameJson.add("blackUsername", new JsonPrimitive(username));
                 this.localPlayerColor = "BLACK";
             }
@@ -290,8 +296,7 @@ public class Client implements ServerMessageObserver {
             serverFacade.joinGame(this.authToken, gameID, playerColor);
             getGamesJson();
 
-
-
+            //try to make the dumb web socket connection
 
             //get the game board
             Gson gson2 = new Gson();
@@ -306,51 +311,48 @@ public class Client implements ServerMessageObserver {
             System.out.println("Error: " + e.getMessage());
         }
     }
-    private boolean playerIsAvailable(String number, String desiredColor){
+
+    private boolean playerIsAvailable(String number, String desiredColor) {
         JsonElement jsonElement = gamesListHashMap.get(Integer.valueOf(number));
-        if (Objects.equals(desiredColor, "WHITE")){
+        if (Objects.equals(desiredColor, "WHITE")) {
             JsonElement whiteUserJson = jsonElement.getAsJsonObject().get("whiteUsername");
             return whiteUserJson == null;
-        }
-        else if (Objects.equals(desiredColor, "BLACK")){
+        } else if (Objects.equals(desiredColor, "BLACK")) {
             JsonElement blackUserJson = jsonElement.getAsJsonObject().get("blackUsername");
             return blackUserJson == null;
         }
         return false;
     }
 
-    private void drawBoardProperOrientation(ChessBoard chessBoard, Boolean highlightMoves){
+    private void drawBoardProperOrientation(ChessBoard chessBoard, Boolean highlightMoves) {
         this.chessBoardUI.setChessBoard(chessBoard);
-        if (Objects.equals(this.localPlayerColor, "WHITE") || this.localPlayerColor == null){
+        if (Objects.equals(this.localPlayerColor, "WHITE") || this.localPlayerColor == null) {
             //print with white at the bottom
             this.chessBoardUI.drawBoardWhite(highlightMoves);
-        }
-        else{
+        } else {
             //print it with black at the bottom
             this.chessBoardUI.drawBoardBlack(highlightMoves);
         }
         System.out.println("\n");
     }
 
-    private void redrawChessBoard(){
+    private void redrawChessBoard() {
         ChessBoard currBoard = getCurrBoard();
         drawBoardProperOrientation(currBoard, false);
     }
 
 
-    private void leaveGame(){
+    private void leaveGame() {
         if (localPlayerColor == null) {
             System.out.println("\nYou have successfully exited the game you were observing. \nWelcome back to the post login menu.\n");
 
             this.inGameplayMode = false;
-            postLogin();
-        }
-        else{
+        } else {
             System.out.println("You are an active player and as such, cannot leave the game. Choose a valid command.\n");
         }
     }
 
-    private ChessBoard getCurrBoard(){
+    private ChessBoard getCurrBoard() {
         //get the most recent board and update the local variable
         getGamesJson();
         JsonObject gameJson = gamesListHashMap.get(this.gameNumber).getAsJsonObject();
@@ -360,7 +362,8 @@ public class Client implements ServerMessageObserver {
         return gameData.getChessBoard();
     }
 
-    private void highlightLegalMoves(){
+
+    public ChessPosition getValidCoordinates() {
         ChessBoard currentBoard = getCurrBoard();
         HashMap<String, Integer> correctColorHashMap;
         //initialize a hash map to get the coordinates in numeric form
@@ -395,45 +398,63 @@ public class Client implements ServerMessageObserver {
         possibleRows.add(8);
 
         //query the client for the piece it wishes to see the moves for
-        if (this.localPlayerColor == "WHITE" || this.localPlayerColor == null){
+        if (this.localPlayerColor == "WHITE" || this.localPlayerColor == null) {
             correctColorHashMap = letterToNumberWhite;
-        }
-        else{
+        } else {
             correctColorHashMap = letterToNumberBlack;
         }
 
-        System.out.println("What is the letter coordinate of the piece you wish to see legal moves for?");
+        System.out.println("What is the letter coordinate of the piece you wish to see select?");
         Boolean validLetterCoordinate = false;
         Integer letterCor = 0;
-        while (!validLetterCoordinate){
+        while (!validLetterCoordinate) {
             String letterCorString = scanner.nextLine().toLowerCase();
-            if (correctColorHashMap.containsKey(letterCorString)){
+            if (correctColorHashMap.containsKey(letterCorString)) {
                 validLetterCoordinate = true;
                 letterCor = correctColorHashMap.get(letterCorString);
-            }
-            else{
+            } else {
                 System.out.println("this is an invalid Coordinate. Try Again.");
             }
         }
-        System.out.println("What is the number coordinate of the piece you wish to see legal moves for?");
+        System.out.println("What is the number coordinate of the piece you wish to select?");
         Integer numberCor = Integer.parseInt(scanner.nextLine());
         Boolean validNumberCoordinate = false;
-        while (!validNumberCoordinate){
-            if (possibleRows.contains(numberCor)){
+        while (!validNumberCoordinate) {
+            if (possibleRows.contains(numberCor)) {
                 validNumberCoordinate = true;
-            }
-            else{
+            } else {
                 System.out.println("This is an invalid number coordinate. Enter a valid number now:");
                 numberCor = Integer.parseInt(scanner.nextLine());
             }
         }
-        ChessPiece currPiece = currentBoard.getPiece(new ChessPosition(numberCor, letterCor));
-        Collection<ChessMove> possibleMoves =currPiece.pieceMoves(currentBoard, new ChessPosition(numberCor, letterCor));
+        return new ChessPosition(numberCor, letterCor);
+    }
+
+    private void highlightLegalMoves() {
+        ChessBoard currentBoard = getCurrBoard();
+        ChessPosition selectedPosition = getValidCoordinates();
+        ChessPiece currPiece = currentBoard.getPiece(selectedPosition);
+        Collection<ChessMove> possibleMoves = currPiece.pieceMoves(currentBoard, selectedPosition);
         this.chessBoardUI.setPossibleMoves(possibleMoves);
-        this.chessBoardUI.setStartingPosition(new ChessPosition(numberCor, letterCor));
+        this.chessBoardUI.setStartingPosition(selectedPosition);
 
         System.out.print("The legal moves for your selected piece are highlighted below:");
         drawBoardProperOrientation(currentBoard, true);
 
+    }
+
+    private void makeMove() {
+        ChessPosition selectedPosition = getValidCoordinates();
+
+    }
+    private void resign(){
+        System.out.println("Are you sure you wish to resign? Type 'yes' to continue:");
+        String response = scanner.nextLine().toLowerCase();
+        if (!Objects.equals(response, "yes")){
+            System.out.println("Returning to the gameplay menu:");
+            return;
+        }
+        System.out.println("okay not coded yet but consider yourself resigned.");
+        //do something to resign, idk
     }
 }

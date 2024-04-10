@@ -262,7 +262,6 @@ public class Server {
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");
 
-//        Spark.webSocket("/connect", WSServer.class);
 
         clearEndpoint();
         registerEndpoint();
