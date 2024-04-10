@@ -4,6 +4,20 @@
 
     <artifactId>shared</artifactId>
     <version>1.0.0</version>
+    <dependencies>
+        <dependency>
+            <groupId>edu.byu.cs240</groupId>
+            <artifactId>passoff-dependencies</artifactId>
+            <version>1.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>edu.byu.cs240</groupId>
+            <artifactId>passoff-dependencies</artifactId>
+            <version>1.0</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
     <parent>
         <artifactId>chess</artifactId>
