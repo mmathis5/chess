@@ -15,12 +15,12 @@ public class Client implements ServerMessageObserver {
     ChessBoardUI chessBoardUI = new ChessBoardUI();
     Boolean inGameplayMode = false;
     String localPlayerColor = null;
-    ChessBoard localGameBoard = null;
     String authToken = null;
     String username = null;
     Integer gameNumber;
     JsonArray jsonOfGames;
     Scanner scanner = new Scanner(System.in);
+
     private ServerFacade serverFacade;
     private HashMap<Integer, JsonElement> gamesListHashMap = new HashMap<Integer, JsonElement>();
 
@@ -362,16 +362,28 @@ public class Client implements ServerMessageObserver {
 
     private void highlightLegalMoves(){
         ChessBoard currentBoard = getCurrBoard();
+        HashMap<String, Integer> correctColorHashMap;
         //initialize a hash map to get the coordinates in numeric form
-        HashMap<String, Integer> letterToNumber = new HashMap<String, Integer>();
-        letterToNumber.put("a", 1);
-        letterToNumber.put("b", 2);
-        letterToNumber.put("c", 3);
-        letterToNumber.put("d", 4);
-        letterToNumber.put("e", 5);
-        letterToNumber.put("f", 6);
-        letterToNumber.put("g", 7);
-        letterToNumber.put("h", 8);
+        HashMap<String, Integer> letterToNumberWhite = new HashMap<String, Integer>();
+        letterToNumberWhite.put("a", 1);
+        letterToNumberWhite.put("b", 2);
+        letterToNumberWhite.put("c", 3);
+        letterToNumberWhite.put("d", 4);
+        letterToNumberWhite.put("e", 5);
+        letterToNumberWhite.put("f", 6);
+        letterToNumberWhite.put("g", 7);
+        letterToNumberWhite.put("h", 8);
+
+        HashMap<String, Integer> letterToNumberBlack = new HashMap<String, Integer>();
+        letterToNumberBlack.put("a", 8);
+        letterToNumberBlack.put("b", 7);
+        letterToNumberBlack.put("c", 6);
+        letterToNumberBlack.put("d", 5);
+        letterToNumberBlack.put("e", 4);
+        letterToNumberBlack.put("f", 3);
+        letterToNumberBlack.put("g", 2);
+        letterToNumberBlack.put("h", 1);
+
         ArrayList<Integer> possibleRows = new ArrayList<>();
         possibleRows.add(1);
         possibleRows.add(2);
@@ -383,14 +395,21 @@ public class Client implements ServerMessageObserver {
         possibleRows.add(8);
 
         //query the client for the piece it wishes to see the moves for
+        if (this.localPlayerColor == "WHITE" || this.localPlayerColor == null){
+            correctColorHashMap = letterToNumberWhite;
+        }
+        else{
+            correctColorHashMap = letterToNumberBlack;
+        }
+
         System.out.println("What is the letter coordinate of the piece you wish to see legal moves for?");
         Boolean validLetterCoordinate = false;
         Integer letterCor = 0;
         while (!validLetterCoordinate){
             String letterCorString = scanner.nextLine().toLowerCase();
-            if (letterToNumber.containsKey(letterCorString)){
+            if (correctColorHashMap.containsKey(letterCorString)){
                 validLetterCoordinate = true;
-                letterCor = letterToNumber.get(letterCorString);
+                letterCor = correctColorHashMap.get(letterCorString);
             }
             else{
                 System.out.println("this is an invalid Coordinate. Try Again.");
