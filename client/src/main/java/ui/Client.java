@@ -338,6 +338,7 @@ public class Client implements ServerMessageObserver {
             //print it with black at the bottom
             this.chessBoardUI.drawBoardBlack(highlightMoves);
         }
+        System.out.println("\n");
     }
 
     private void redrawChessBoard(){
@@ -419,6 +420,9 @@ public class Client implements ServerMessageObserver {
         ChessPiece currPiece = currentBoard.getPiece(new ChessPosition(numberCor, letterCor));
         Collection<ChessMove> possibleMoves =currPiece.pieceMoves(currentBoard, new ChessPosition(numberCor, letterCor));
         this.chessBoardUI.setPossibleMoves(possibleMoves);
+        this.chessBoardUI.setStartingPosition(new ChessPosition(numberCor, letterCor));
+
+        System.out.print("The legal moves for your selected piece are highlighted below:");
         drawBoardProperOrientation(currentBoard, true);
 
     }

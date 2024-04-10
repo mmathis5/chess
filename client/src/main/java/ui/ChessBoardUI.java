@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Objects;
 
 public class ChessBoardUI {
     private static Boolean isWhite = true;
@@ -18,6 +19,8 @@ public class ChessBoardUI {
     private static ArrayList<ChessPosition> possibleEndPosition = new ArrayList<>();
     private static Boolean highlightMovesFeature = false;
     private static Boolean highlightThisSquare = false;
+    private static ChessPosition startingPosition;
+    private static Boolean isStartingPosition = false;
     ChessBoardUI(){}
 
     public void setChessBoard(ChessBoard chessBoard){
@@ -27,6 +30,9 @@ public class ChessBoardUI {
     public void setPossibleMoves(Collection<ChessMove> possibleMoves) {
         ChessBoardUI.possibleMoves = possibleMoves;
         getPossibleEndPosition();
+    }
+    public void setStartingPosition(ChessPosition startingPosition){
+        ChessBoardUI.startingPosition = startingPosition;
     }
 
     private static boolean isPossibleMove(ChessPosition possiblePosition){
@@ -130,6 +136,9 @@ public class ChessBoardUI {
                     if (isPossibleMove(new ChessPosition(row, boardCol))){
                         ChessBoardUI.highlightThisSquare = true;
                     }
+                    if(Objects.equals(startingPosition, new ChessPosition(row, boardCol))){
+                        isStartingPosition = true;
+                    }
                     else {
                         setWhite(out);
                     }
@@ -158,10 +167,6 @@ public class ChessBoardUI {
         out.print(SET_TEXT_COLOR_BLACK);
     }
 
-    private static void setHighlight(PrintStream out){
-        out.print(SET_BG_COLOR_YELLOW);
-        out.print(SET_TEXT_COLOR_YELLOW);
-    }
     private static ChessPiece getPiece(int row, int column){
         return chessBoard.getPiece(new ChessPosition(row, column));
     }
@@ -170,13 +175,15 @@ public class ChessBoardUI {
         //set square color
         if (isWhite()) {
             out.print(SET_BG_COLOR_WHITE);
+        } else {
+            out.print(SET_BG_COLOR_BLACK);
         }
-        else if (highlightThisSquare){
+        if (highlightThisSquare){
             out.print(SET_BG_COLOR_YELLOW);
         }
-        else{
-            out.print(SET_BG_COLOR_BLACK);
-            out.print(SET_TEXT_COLOR_RED);
+        if (isStartingPosition && highlightMovesFeature){
+            out.print(SET_BG_COLOR_GREEN);
+            isStartingPosition = false;
         }
         //get piece type and color
         if (piece != null){
