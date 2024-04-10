@@ -7,6 +7,7 @@ import com.google.gson.*;
 import dataAccess.exceptions.DataAccessException;
 import model.GameData;
 import server.Server;
+import model.GameData;
 
 import java.util.*;
 
@@ -17,6 +18,7 @@ public class Client implements ServerMessageObserver {
     ChessBoard localGameBoard = null;
     String authToken = null;
     String username = null;
+    Integer gameNumber;
     JsonArray jsonOfGames;
     Scanner scanner = new Scanner(System.in);
     private ServerFacade serverFacade;
@@ -129,7 +131,7 @@ public class Client implements ServerMessageObserver {
         try {
             switch (input) {
                 case "1" -> helpGameplayMode();
-                //case "2" -> redrawChessBoard();
+                case "2" -> redrawChessBoard();
                 case "3" -> leaveGame();
                 case "6" -> highlightLegalMoves();
                 default -> System.out.println("Command not yet implemented");
@@ -271,6 +273,7 @@ public class Client implements ServerMessageObserver {
             listGames();
             System.out.println("Enter the number of the game you wish to join: ");
             String number = scanner.nextLine();
+            this.gameNumber = Integer.parseInt(number);
             isValidGame(number);
             String playerColor = null;
             //check if we need to get the player
@@ -304,7 +307,7 @@ public class Client implements ServerMessageObserver {
             GameData chessGame = gson2.fromJson(gameJson, GameData.class);
             this.inGameplayMode = true;
             this.chessBoardUI.setChessBoard(chessGame.getChessBoard());
-            drawBoardProperOrientation(chessGame.getChessBoard());
+            drawBoardProperOrientation(chessGame.getChessBoard(), false);
 
 
             gameplayMode();
@@ -325,21 +328,23 @@ public class Client implements ServerMessageObserver {
         return false;
     }
 
-    private void drawBoardProperOrientation(ChessBoard chessBoard){
+    private void drawBoardProperOrientation(ChessBoard chessBoard, Boolean highlightMoves){
         this.chessBoardUI.setChessBoard(chessBoard);
         if (Objects.equals(this.localPlayerColor, "WHITE") || this.localPlayerColor == null){
             //print with white at the bottom
-            this.chessBoardUI.drawBoardWhite();
+            this.chessBoardUI.drawBoardWhite(highlightMoves);
         }
         else{
             //print it with black at the bottom
-            this.chessBoardUI.drawBoardBlack();
+            this.chessBoardUI.drawBoardBlack(highlightMoves);
         }
     }
 
-//    private void redrawChessBoard(){
-//        drawBoardProperOrientation();
-//    }
+    private void redrawChessBoard(){
+        ChessBoard currBoard = getCurrBoard();
+        drawBoardProperOrientation(currBoard, false);
+    }
+
 
     private void leaveGame(){
         if (localPlayerColor == null) {
@@ -353,7 +358,18 @@ public class Client implements ServerMessageObserver {
         }
     }
 
+    private ChessBoard getCurrBoard(){
+        //get the most recent board and update the local variable
+        getGamesJson();
+        JsonObject gameJson = gamesListHashMap.get(this.gameNumber).getAsJsonObject();
+        updateHashMapValue(this.gameNumber, gameJson);
+        Gson gson = new Gson();
+        GameData gameData = gson.fromJson(gameJson, GameData.class);
+        return gameData.getChessBoard();
+    }
+
     private void highlightLegalMoves(){
+        ChessBoard currentBoard = getCurrBoard();
         //initialize a hash map to get the coordinates in numeric form
         HashMap<String, Integer> letterToNumber = new HashMap<String, Integer>();
         letterToNumber.put("a", 1);
@@ -364,13 +380,46 @@ public class Client implements ServerMessageObserver {
         letterToNumber.put("f", 6);
         letterToNumber.put("g", 7);
         letterToNumber.put("h", 8);
+        ArrayList<Integer> possibleRows = new ArrayList<>();
+        possibleRows.add(1);
+        possibleRows.add(2);
+        possibleRows.add(3);
+        possibleRows.add(4);
+        possibleRows.add(5);
+        possibleRows.add(6);
+        possibleRows.add(7);
+        possibleRows.add(8);
+
         //query the client for the piece it wishes to see the moves for
         System.out.println("What is the letter coordinate of the piece you wish to see legal moves for?");
-        Integer letterCor = letterToNumber.get(scanner.nextLine().toLowerCase());
+        Boolean validLetterCoordinate = false;
+        Integer letterCor = 0;
+        while (!validLetterCoordinate){
+            String letterCorString = scanner.nextLine().toLowerCase();
+            if (letterToNumber.containsKey(letterCorString)){
+                validLetterCoordinate = true;
+                letterCor = letterToNumber.get(letterCorString);
+            }
+            else{
+                System.out.println("this is an invalid Coordinate. Try Again.");
+            }
+        }
         System.out.println("What is the number coordinate of the piece you wish to see legal moves for?");
         Integer numberCor = Integer.parseInt(scanner.nextLine());
-        ChessPiece currPiece = localGameBoard.getPiece(new ChessPosition(letterCor, numberCor));
-        Collection<ChessMove> possibleMoves =currPiece.pieceMoves(localGameBoard, new ChessPosition(letterCor, numberCor));
-        System.out.println(currPiece.getPieceType());
+        Boolean validNumberCoordinate = false;
+        while (!validNumberCoordinate){
+            if (possibleRows.contains(numberCor)){
+                validNumberCoordinate = true;
+            }
+            else{
+                System.out.println("This is an invalid number coordinate. Enter a valid number now:");
+                numberCor = Integer.parseInt(scanner.nextLine());
+            }
+        }
+        ChessPiece currPiece = currentBoard.getPiece(new ChessPosition(numberCor, letterCor));
+        Collection<ChessMove> possibleMoves =currPiece.pieceMoves(currentBoard, new ChessPosition(numberCor, letterCor));
+        this.chessBoardUI.setPossibleMoves(possibleMoves);
+        drawBoardProperOrientation(currentBoard, true);
+
     }
 }

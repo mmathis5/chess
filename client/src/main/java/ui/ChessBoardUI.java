@@ -1,12 +1,12 @@
 package ui;
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 
 import static ui.EscapeSequences.*;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 public class ChessBoardUI {
     private static Boolean isWhite = true;
@@ -14,16 +14,38 @@ public class ChessBoardUI {
     private static final int SQUARE_SIZE_IN_CHARS = 1;
     private static final String EMPTY = " ";
     private static ChessBoard chessBoard = new ChessBoard();
+    private static Collection<ChessMove> possibleMoves;
+    private static ArrayList<ChessPosition> possibleEndPosition = new ArrayList<>();
+    private static Boolean highlightMovesFeature = false;
+    private static Boolean highlightThisSquare = false;
     ChessBoardUI(){}
 
     public void setChessBoard(ChessBoard chessBoard){
         this.chessBoard = chessBoard;
     }
 
-    public void drawBoardWhite(){
-        //before the board is ever printed, it makes a call to the SQL database to update the board
+    public void setPossibleMoves(Collection<ChessMove> possibleMoves) {
+        ChessBoardUI.possibleMoves = possibleMoves;
+        getPossibleEndPosition();
+    }
 
-
+    private static boolean isPossibleMove(ChessPosition possiblePosition){
+        if (possibleEndPosition.contains(possiblePosition)){
+            return true;
+        }
+        return false;
+    }
+    private void getPossibleEndPosition(){
+        Iterator<ChessMove> possibleMovesIterator = possibleMoves.iterator();
+        ArrayList<ChessPosition> possibleEndPosition = new ArrayList<>();
+        while (possibleMovesIterator.hasNext()){
+            ChessMove currMove = possibleMovesIterator.next();
+            possibleEndPosition.add(currMove.getEndPosition());
+        }
+        ChessBoardUI.possibleEndPosition = possibleEndPosition;
+    }
+    public void drawBoardWhite(Boolean highlightMoves){
+        ChessBoardUI.highlightMovesFeature = highlightMoves;
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.println("\n");
@@ -36,7 +58,8 @@ public class ChessBoardUI {
         out.print(SET_TEXT_COLOR_WHITE);
     }
 
-    public void drawBoardBlack(){
+    public void drawBoardBlack(Boolean highlightMoves){
+        ChessBoardUI.highlightMovesFeature = highlightMoves;
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.println("\n");
@@ -103,7 +126,17 @@ public class ChessBoardUI {
                     out.print(EMPTY);
                     continue;
                 }
-                setWhite(out);
+                if (!possibleEndPosition.isEmpty() && highlightMovesFeature){
+                    if (isPossibleMove(new ChessPosition(row, boardCol))){
+                        ChessBoardUI.highlightThisSquare = true;
+                    }
+                    else {
+                        setWhite(out);
+                    }
+                }
+                else{
+                    setWhite(out);
+                }
 
                 printSquare(out, getPiece(row, boardCol));
                 setBlack(out);
@@ -125,9 +158,9 @@ public class ChessBoardUI {
         out.print(SET_TEXT_COLOR_BLACK);
     }
 
-    private static void setGray(PrintStream out){
-        out.print(SET_BG_COLOR_DARK_GREY);
-        out.print(SET_TEXT_COLOR_BLACK);
+    private static void setHighlight(PrintStream out){
+        out.print(SET_BG_COLOR_YELLOW);
+        out.print(SET_TEXT_COLOR_YELLOW);
     }
     private static ChessPiece getPiece(int row, int column){
         return chessBoard.getPiece(new ChessPosition(row, column));
@@ -137,6 +170,9 @@ public class ChessBoardUI {
         //set square color
         if (isWhite()) {
             out.print(SET_BG_COLOR_WHITE);
+        }
+        else if (highlightThisSquare){
+            out.print(SET_BG_COLOR_YELLOW);
         }
         else{
             out.print(SET_BG_COLOR_BLACK);
@@ -177,6 +213,7 @@ public class ChessBoardUI {
         out.print(pieceString);
         out.print(EMPTY);
         setWhite(out);
+        highlightThisSquare = false;
     }
 
     private static Boolean isWhite(){
