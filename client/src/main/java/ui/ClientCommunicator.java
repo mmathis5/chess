@@ -1,14 +1,11 @@
 package ui;
 import com.google.gson.JsonObject;
-import ui.ServerFacade;
-import ui.ChessBoardUI;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import com.google.gson.JsonObject;
 
 public class ClientCommunicator {
 

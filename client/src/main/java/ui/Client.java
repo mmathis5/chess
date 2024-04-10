@@ -7,7 +7,7 @@ import com.google.gson.*;
 //import dataAccess.exceptions.DataAccessException;
 import model.GameData;
 //import server.Server;
-import model.GameData;
+import ui.DrawingChessBoard.ChessBoardUI;
 
 import java.util.*;
 
@@ -283,10 +283,14 @@ public class Client implements ServerMessageObserver {
             updateHashMapValue(Integer.valueOf(number), gameJson);
             //using the number, get the gameID
             String gameID = gameJson.getAsJsonObject().get("gameID").toString();
+            //Establish a Websocket connection with the http server
+
             //make the http call
+
             serverFacade.joinGame(this.authToken, gameID, playerColor);
             getGamesJson();
-            //update the hashMap
+
+
 
 
             //get the game board

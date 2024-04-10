@@ -1,7 +1,7 @@
-package ui;
+package ui.DrawingChessBoard;
 import chess.*;
 
-import static ui.EscapeSequences.*;
+import static ui.DrawingChessBoard.EscapeSequences.*;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
