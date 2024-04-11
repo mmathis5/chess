@@ -14,6 +14,20 @@ public class GameData {
     private String blackUsername;
     private String gameName;
 
+    public void setGameIsComplete(Boolean gameIsComplete) {
+        this.gameIsComplete = gameIsComplete;
+    }
+
+    public void setGameID(Integer gameID) {
+        this.gameID = gameID;
+    }
+
+    public Boolean getGameIsComplete() {
+        return gameIsComplete;
+    }
+
+    private Boolean gameIsComplete = false;
+
     public ChessGame getChessGame() {
         return chessGame;
     }

@@ -150,6 +150,10 @@ public class GameService {
             }
             //assuming the move is valid, make the move.
             chessGame.makeMove(chessMove);
+            //markGameComplete if it is in checkmate.
+            if (chessGame.isInCheckmate(ChessGame.TeamColor.BLACK) || chessGame.isInCheckmate(ChessGame.TeamColor.WHITE)){
+                gameData.setGameIsComplete(true);
+            }
             gameData.setChessGame(chessGame);
             gameDAO.updateGame(gameID, gameData);
 

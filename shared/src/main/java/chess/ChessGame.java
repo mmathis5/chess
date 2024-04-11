@@ -87,7 +87,7 @@ public class ChessGame {
         ChessPiece piece = board.getPiece(move.getStartPosition());
         //confirm that it is their turn
         if (piece.getTeamColor() != getTeamTurn()){
-            throw new InvalidMoveException();
+            throw new InvalidMoveException("it is not your team's turn");
         }
         //check if move is invalid because there is no piece there
         if (piece == null){

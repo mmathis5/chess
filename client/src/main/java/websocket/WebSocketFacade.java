@@ -34,7 +34,6 @@ public class WebSocketFacade extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    System.out.println("Message Received: " + message);
                     try {
                         ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
                         notificationHandler.notify(message, notification.getServerMessageType());
@@ -75,9 +74,7 @@ public class WebSocketFacade extends Endpoint {
             throw e;
         }
     }
-    public void leaveGame(String visitorName) throws Exception{
 
-    }
     public void makeMove(String authToken, int gameID, ChessMove move) throws Exception{
         try{
             MakeMove makeMove = new MakeMove(authToken, gameID, move);
@@ -85,7 +82,27 @@ public class WebSocketFacade extends Endpoint {
         }
         catch (Exception e){
             System.out.println("Error: " + e.getMessage());
+            //throw e;
+        }
+    }
+    public void leaveGame(String authToken, int gameID) throws Exception{
+        try{
+            Leave leave = new Leave(authToken, gameID);
+            this.session.getBasicRemote().sendText(jsonMapper.toJson(leave));
+        }
+        catch (Exception e){
+            System.out.println("Error: " + e.getMessage());
             throw e;
+        }
+    }
+
+    public void resign(String authToken, int gameID) throws IOException {
+        try{
+            Resign resign = new Resign(authToken, gameID);
+            this.session.getBasicRemote().sendText(jsonMapper.toJson(resign));
+        }
+        catch (Exception e){
+            System.out.println("Error resign: " + e.getMessage());
         }
     }
 

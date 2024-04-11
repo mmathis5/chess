@@ -116,39 +116,54 @@ public class ChessBoardUI {
         int row = 1;
         for (int boardRow = 0; boardRow < 8; ++boardRow) {
             isWhite = boardRow % 2 == 0;
-            drawRowOfSquares(out, row);
+            drawRowOfSquaresFlipped(out, row);
             row ++;
         }
+    }
+
+    private static void drawRowOfSquaresFlipped(PrintStream out, int row) {
+        for (int squareRow = 0; squareRow < SQUARE_SIZE_IN_CHARS; ++squareRow) {
+            for (int boardCol = 9; boardCol > -1; --boardCol) {
+                //print the row labels
+                drawRow(out, row, boardCol);
+            }
+            out.print(SET_BG_COLOR_BLACK);
+            out.println();
+        }
+    }
+
+    private static void drawRow(PrintStream out, int row, int boardCol) {
+        if (boardCol == 0 || boardCol == 9){
+            out.print(SET_BG_COLOR_LIGHT_GREY);
+            out.print(EMPTY);
+            out.print(row);
+            out.print(EMPTY);
+            return;
+        }
+        if (!possibleEndPosition.isEmpty() && highlightMovesFeature){
+            if (isPossibleMove(new ChessPosition(row, boardCol))){
+                ChessBoardUI.highlightThisSquare = true;
+            }
+            if(Objects.equals(startingPosition, new ChessPosition(row, boardCol))){
+                isStartingPosition = true;
+            }
+            else {
+                setWhite(out);
+            }
+        }
+        else{
+            setWhite(out);
+        }
+
+        printSquare(out, getPiece(row, boardCol));
+        setBlack(out);
     }
 
     private static void drawRowOfSquares(PrintStream out, int row) {
         for (int squareRow = 0; squareRow < SQUARE_SIZE_IN_CHARS; ++squareRow) {
             for (int boardCol = 0; boardCol < 10; ++boardCol) {
                 //print the row labels
-                if (boardCol == 0 || boardCol == 9){
-                    out.print(SET_BG_COLOR_LIGHT_GREY);
-                    out.print(EMPTY);
-                    out.print(row);
-                    out.print(EMPTY);
-                    continue;
-                }
-                if (!possibleEndPosition.isEmpty() && highlightMovesFeature){
-                    if (isPossibleMove(new ChessPosition(row, boardCol))){
-                        ChessBoardUI.highlightThisSquare = true;
-                    }
-                    if(Objects.equals(startingPosition, new ChessPosition(row, boardCol))){
-                        isStartingPosition = true;
-                    }
-                    else {
-                        setWhite(out);
-                    }
-                }
-                else{
-                    setWhite(out);
-                }
-
-                printSquare(out, getPiece(row, boardCol));
-                setBlack(out);
+                drawRow(out, row, boardCol);
             }
             out.print(SET_BG_COLOR_BLACK);
             out.println();

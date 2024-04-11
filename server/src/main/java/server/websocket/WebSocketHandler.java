@@ -67,7 +67,7 @@ public class WebSocketHandler {
             localUsername = userService.getUsername(command.getAuthString());
             LoadGame loadGame = new LoadGame(Integer.parseInt(command.getGameid()));
             session.getRemote().sendString(jsonMapper.toJson(loadGame));
-            connections.broadcast(command.getAuthString(), jsonMapper.toJson(new Notification(localUsername + " has joined the game as the " + command.getPlayerColor() + "player." )));
+            connections.broadcast(command.getAuthString(), jsonMapper.toJson(new Notification(localUsername + " has joined the game as the " + command.getPlayerColor() + " player." )));
         }
         catch (Exception e){
             Error error = new Error("Error Joining Player: " + e.getMessage());
@@ -94,6 +94,7 @@ public class WebSocketHandler {
     }
     private void make_move(String message, Session session) throws IOException{
         MakeMove command = new Gson().fromJson(message, MakeMove.class);
+        //i think the connection is already there
         connections.add(command.getAuthString(), session);
         String localUsername = null;
         try{
@@ -115,11 +116,27 @@ public class WebSocketHandler {
     private void leave(String message, Session session) throws IOException{
         Leave command = new Gson().fromJson(message, Leave.class);
         connections.remove(command.getAuthString());
+        try {
+            String localUsername = userService.getUsername(command.getAuthString());
+            connections.broadcast(command.getAuthString(), jsonMapper.toJson(new Notification(localUsername + " has left the game")));
+        }
+        catch(Exception e){
+            Error error = new Error("Error leaving: " + e.getMessage());
+            session.getRemote().sendString(jsonMapper.toJson(error));
+        }
     }
 
     private void resign(String message, Session session) throws IOException{
         Resign command = new Gson().fromJson(message, Resign.class);
         connections.remove(command.getAuthString());
+        try{
+            String localUsername = userService.getUsername(command.getAuthString());
+            connections.broadcast(command.getAuthString(), jsonMapper.toJson(new Notification(localUsername + " has resigned from the game")));
+        }
+        catch(Exception e){
+            Error error = new Error("Error Resigning: "+ e.getMessage());
+            session.getRemote().sendString(jsonMapper.toJson(error));
+        }
     }
 
 //    private void enter(String visitorName, Session session) throws IOException {
