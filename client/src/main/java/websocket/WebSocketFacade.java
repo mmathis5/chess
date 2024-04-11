@@ -78,9 +78,9 @@ public class WebSocketFacade extends Endpoint {
     public void leaveGame(String visitorName) throws Exception{
 
     }
-    public void makeMove(String authToken, String gameID, ChessMove move) throws Exception{
+    public void makeMove(String authToken, int gameID, ChessMove move) throws Exception{
         try{
-            MakeMove makeMove = new MakeMove(authToken, Integer.parseInt(gameID), move);
+            MakeMove makeMove = new MakeMove(authToken, gameID, move);
             this.session.getBasicRemote().sendText(jsonMapper.toJson(makeMove));
         }
         catch (Exception e){

@@ -40,6 +40,13 @@ public class Client implements NotificationHandler {
         System.out.println(message);
         if (type == ServerMessage.ServerMessageType.LOAD_GAME){
             redrawChessBoard();
+            if (localPlayerColor == null){
+                System.out.println("You've joined the game as an observer");
+            }
+            else{
+                System.out.println("You've joined the game as the " + localPlayerColor.toLowerCase() + " color.");
+            }
+            System.out.println("Enter a gameplay command: ");
         }
         else if (type == ServerMessage.ServerMessageType.NOTIFICATION){
             Notification notification = new Gson().fromJson(message, Notification.class);
@@ -49,7 +56,7 @@ public class Client implements NotificationHandler {
             Error notification = new Gson().fromJson(message, Error.class);
             System.out.println("Error: " + notification.getErrorMessage());
         }
-        gameplayMode();
+
     }
 
     public void preLogin() {
@@ -85,6 +92,9 @@ public class Client implements NotificationHandler {
 
     public void postLogin() {
         while (this.authToken != null) {
+            if (this.inGameplayMode){
+                gameplayMode();
+            }
             System.out.println("Post Login Menu:");
             System.out.println("1. Help");
             System.out.println("2. Logout");
@@ -341,6 +351,7 @@ public class Client implements NotificationHandler {
 //            this.chessBoardUI.setChessBoard(chessGame.getChessBoard());
 //            drawBoardProperOrientation(chessGame.getChessBoard(), false);
 
+            gameplayMode();
 
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
@@ -391,7 +402,7 @@ public class Client implements NotificationHandler {
     private void redrawChessBoard() {
         ChessBoard currBoard = getCurrBoard();
         drawBoardProperOrientation(currBoard, false);
-    //    gameplayMode();
+
     }
 
 
@@ -416,7 +427,7 @@ public class Client implements NotificationHandler {
     }
 
 
-    public ChessPosition getValidCoordinates() {
+    public ChessPosition getValidCoordinates(String command) {
         ChessBoard currentBoard = getCurrBoard();
         HashMap<String, Integer> correctColorHashMap;
         //initialize a hash map to get the coordinates in numeric form
@@ -457,7 +468,7 @@ public class Client implements NotificationHandler {
             correctColorHashMap = letterToNumberBlack;
         }
 
-        System.out.println("What is the letter coordinate of the piece you wish to see select?");
+        System.out.println("What is the letter coordinate of the " + command);
         Boolean validLetterCoordinate = false;
         Integer letterCor = 0;
         while (!validLetterCoordinate) {
@@ -469,7 +480,7 @@ public class Client implements NotificationHandler {
                 System.out.println("this is an invalid Coordinate. Try Again.");
             }
         }
-        System.out.println("What is the number coordinate of the piece you wish to select?");
+        System.out.println("What is the number coordinate of " + command);
         Integer numberCor = Integer.parseInt(scanner.nextLine());
         Boolean validNumberCoordinate = false;
         while (!validNumberCoordinate) {
@@ -485,7 +496,7 @@ public class Client implements NotificationHandler {
 
     private void highlightLegalMoves() {
         ChessBoard currentBoard = getCurrBoard();
-        ChessPosition selectedPosition = getValidCoordinates();
+        ChessPosition selectedPosition = getValidCoordinates("piece you wish to see legal moves for?");
         ChessPiece currPiece = currentBoard.getPiece(selectedPosition);
         Collection<ChessMove> possibleMoves = currPiece.pieceMoves(currentBoard, selectedPosition);
         this.chessBoardUI.setPossibleMoves(possibleMoves);
@@ -496,8 +507,33 @@ public class Client implements NotificationHandler {
 
     }
 
-    private void makeMove() {
-        ChessPosition selectedPosition = getValidCoordinates();
+    private void makeMove() throws Exception {
+        ChessPosition selectedPosition = getValidCoordinates("piece you wish to move?");
+        ChessPosition newLocation = getValidCoordinates("location you wish to move the piece to?");
+        System.out.println("Do you wish to add a promotional piece to this move? (y/n)");
+        String promoPieceBool = scanner.nextLine().toLowerCase();
+        ChessPiece.PieceType promoPiece = null;
+        if (promoPieceBool == "y"){
+            System.out.println("What piece do you wish to promote?");
+            String promoPieceTypeString = scanner.nextLine().toLowerCase();
+            if (promoPieceTypeString.equals("queen")){
+                promoPiece = ChessPiece.PieceType.QUEEN;
+            }
+            if (promoPieceTypeString.equals("king")){
+                promoPiece = ChessPiece.PieceType.KING;
+            }
+            if (promoPieceTypeString.equals("knight")){
+                promoPiece = ChessPiece.PieceType.KNIGHT;
+            }
+            if (promoPieceTypeString.equals("rook")){
+                promoPiece = ChessPiece.PieceType.ROOK;
+            }
+            if (promoPieceTypeString.equals("bishop")){
+                promoPiece = ChessPiece.PieceType.BISHOP;
+            }
+        }
+        ChessMove desiredMove = new ChessMove(selectedPosition, newLocation, promoPiece);
+        ws.makeMove(authToken, gameNumber, desiredMove);
 
     }
     private void resign(){
