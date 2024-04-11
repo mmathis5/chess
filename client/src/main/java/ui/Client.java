@@ -8,11 +8,15 @@ import com.google.gson.*;
 import model.GameData;
 //import server.Server;
 import ui.DrawingChessBoard.ChessBoardUI;
+import webSocketMessages.Error;
+import webSocketMessages.Notification;
+import webSocketMessages.ServerMessage;
+import websocket.NotificationHandler;
 import websocket.WebSocketFacade;
 
 import java.util.*;
 
-public class Client implements ServerMessageObserver {
+public class Client implements NotificationHandler {
     ChessBoardUI chessBoardUI = new ChessBoardUI();
     Boolean inGameplayMode = false;
     String localPlayerColor = null;
@@ -27,11 +31,24 @@ public class Client implements ServerMessageObserver {
 
     private HashMap<Integer, JsonElement> gamesListHashMap = new HashMap<Integer, JsonElement>();
 
-    public Client() {
-        this.serverFacade = new ServerFacade(8080, this);
+    public Client(String serverURL) {
+        this.serverFacade = new ServerFacade(serverURL);
     }
 
-    public void onMessage(String msg) {
+    public void notify(String message, ServerMessage.ServerMessageType type){
+        System.out.println("message recieved: " + type);
+        System.out.println(message);
+        if (type == ServerMessage.ServerMessageType.LOAD_GAME){
+            redrawChessBoard();
+        }
+        else if (type == ServerMessage.ServerMessageType.NOTIFICATION){
+            Notification notification = new Gson().fromJson(message, Notification.class);
+            System.out.println("Notification: " + notification.getMessage());
+        }
+        else if(type ==  ServerMessage.ServerMessageType.ERROR){
+            Error notification = new Gson().fromJson(message, Error.class);
+            System.out.println("Error: " + notification.getErrorMessage());
+        }
 
     }
 
@@ -293,23 +310,28 @@ public class Client implements ServerMessageObserver {
             String gameID = gameJson.getAsJsonObject().get("gameID").toString();
             //Establish a Websocket connection with the http server
 
-            serverFacade.joinGame(this.authToken, gameID, playerColor);
+            //serverFacade.joinGame(this.authToken, gameID, playerColor);
 
             //try to make the dumb web socket connection
-            ws = new WebSocketFacade(serverURL, null);
-            ws.joinGame(username);
-            String message = String.format("you joined the game as %s", username);
-            System.out.println(message);
+            ws = new WebSocketFacade(serverURL, this);
 
-            //get the game board
-            getGamesJson();
-            Gson gson2 = new Gson();
-            GameData chessGame = gson2.fromJson(gameJson, GameData.class);
+            //fix distinct observer vs player
+            if (needsPlayer) {
+                ws.joinPlayer(this.authToken, gameID, playerColor);
+            }
+            else{
+                ws.joinObserver(this.authToken, gameID);
+            }
             this.inGameplayMode = true;
-            this.chessBoardUI.setChessBoard(chessGame.getChessBoard());
-            drawBoardProperOrientation(chessGame.getChessBoard(), false);
+            //get the game board
+//            getGamesJson();
+//            Gson gson2 = new Gson();
+//            GameData chessGame = gson2.fromJson(gameJson, GameData.class);
+//            this.inGameplayMode = true;
+//            this.chessBoardUI.setChessBoard(chessGame.getChessBoard());
+//            drawBoardProperOrientation(chessGame.getChessBoard(), false);
 
-            gameplayMode();
+
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
@@ -342,6 +364,7 @@ public class Client implements ServerMessageObserver {
     private void redrawChessBoard() {
         ChessBoard currBoard = getCurrBoard();
         drawBoardProperOrientation(currBoard, false);
+        gameplayMode();
     }
 
 

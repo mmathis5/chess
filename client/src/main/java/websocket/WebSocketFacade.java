@@ -1,10 +1,13 @@
 package websocket;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.sun.nio.sctp.NotificationHandler;
+import webSocketMessages.JoinPlayer;
+import webSocketMessages.ServerMessage;
+import webSocketMessages.UserGameCommand;
 
 
-import javax.management.Notification;
 import javax.websocket.*;
 import java.io.IOException;
 import java.net.URI;
@@ -16,6 +19,7 @@ public class WebSocketFacade extends Endpoint {
 
     Session session;
     websocket.NotificationHandler notificationHandler;
+    private Gson jsonMapper = new Gson();
 
 
     public WebSocketFacade(String url, websocket.NotificationHandler notificationHandler) throws Exception {
@@ -31,8 +35,14 @@ public class WebSocketFacade extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    Notification notification = new Gson().fromJson(message, Notification.class);
-                    notificationHandler.notify();
+                    System.out.println("Message Received: " + message);
+                    try {
+                        ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
+                        notificationHandler.notify(message, notification.getServerMessageType());
+                    }
+                    catch (Exception e){
+                        System.out.println("unable to read message: " + e.getMessage());
+                    }
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
@@ -45,7 +55,18 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    public void joinGame(String visitorName) throws Exception {
+    public void joinPlayer(String authToken, String gameID, String playerColor) throws Exception {
+        try{
+            JoinPlayer joinPlayer = new JoinPlayer(authToken, gameID, playerColor);
+            this.session.getBasicRemote().sendText(jsonMapper.toJson(joinPlayer));
+        }
+        catch (Exception e){
+            System.out.println("Error: " + e.getMessage());
+            throw e;
+        }
+
+    }
+    public void joinObserver(String authToken, String gameID){
 
     }
     public void leaveGame(String visitorName) throws Exception{

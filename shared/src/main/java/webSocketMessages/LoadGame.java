@@ -1,10 +1,11 @@
 package webSocketMessages;
 
 public class LoadGame extends ServerMessage{
-    private final String game;
+    private final int game;
 
-    public LoadGame(ServerMessageType type, String game){
-        super(type);
+    public LoadGame(int game){
+        super(ServerMessageType.LOAD_GAME);
         this.game = game;
     }
+
 }

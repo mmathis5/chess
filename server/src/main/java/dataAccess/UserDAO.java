@@ -10,4 +10,5 @@ public interface UserDAO {
     public Boolean userExists(String username);
     public void addUser(String username, UserData user) throws SQLException, UsernameExistsException;
     public UserData getUser(String username) throws SQLException;
+    public String getUsername(String authToken) throws SQLException;
 }

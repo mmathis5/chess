@@ -24,4 +24,9 @@ public class MemoryUserDAO implements UserDAO{
     public UserData getUser(String username){
         return userDataHashMap.get(username);
     }
+
+    public String getUsername(String authToken){
+        return "string";
+
+    }
 }

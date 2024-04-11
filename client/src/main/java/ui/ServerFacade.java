@@ -10,16 +10,11 @@ import java.net.http.HttpResponse;
 public class ServerFacade {
     static HttpClient client = HttpClient.newHttpClient();
     static String serviceUrl;
-    ServerMessageObserver observer;
-    public ServerFacade(int port){
-        serviceUrl = "http://localhost:" + port;
+
+    public ServerFacade(String serviceUrl){
         ClientCommunicator.serviceUrl = serviceUrl;
     }
-    public ServerFacade(int port, ServerMessageObserver observer){
-        serviceUrl = "http://localhost:" + port;
-        ClientCommunicator.serviceUrl = serviceUrl;
-        this.observer = observer;
-    }
+
     public static String login(String username, String password) throws Exception {
         JsonObject json = new JsonObject();
         json.addProperty("username", username);

@@ -68,4 +68,16 @@ public class SQLUserDAO implements UserDAO{
         }
         return user;
     }
+
+    public String getUsername(String authToken) throws SQLException{
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM auths WHERE authToken=?");
+
+        statement.setString(1, authToken);
+        ResultSet resultSet = statement.executeQuery();
+        String username = null;
+        if (resultSet.next()){
+            username = resultSet.getString("username");
+        }
+        return username;
+    }
 }

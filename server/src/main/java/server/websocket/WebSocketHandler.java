@@ -1,22 +1,50 @@
 package server.websocket;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import dataAccess.*;
+import dataAccess.exceptions.DataAccessException;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import service.ClearService;
+import service.GameService;
+import service.UserService;
 import webSocketMessages.*;
+import webSocketMessages.Error;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Timer;
 
 
 @WebSocket
 public class WebSocketHandler {
 
-    private final ConnectionManager connections = new ConnectionManager();
+    private static GameService gameService;
+    private static UserService userService;
 
+    private final ConnectionManager connections = new ConnectionManager();
+    private Gson jsonMapper = new Gson();
+
+    public WebSocketHandler(){
+        try {
+            DatabaseManager.init();
+            GameDAO gameDAO = new SQLGameDAO();
+            UserDAO userDAO = new SQLUserDAO();
+            AuthDAO authDAO = new SQLAuthDAO();
+            this.userService = new UserService(userDAO, authDAO);
+            this.gameService = new GameService(gameDAO, authDAO);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
+        System.out.println("Message received: " + message);
         UserGameCommand userGameCommand = new Gson().fromJson(message, UserGameCommand.class);
         switch (userGameCommand.getCommandType()) {
             case JOIN_PLAYER -> join_player(message, session);
@@ -31,6 +59,19 @@ public class WebSocketHandler {
     private void join_player(String message, Session session) throws IOException{
         JoinPlayer command = new Gson().fromJson(message, JoinPlayer.class);
         connections.add(command.getAuthString(), session);
+        String localUsername = null;
+        try {
+            //case where playerColor is provided
+            gameService.joinGame(Integer.parseInt(command.getGameid()), command.getPlayerColor().toString(), command.getAuthString());
+            localUsername = userService.getUsername(command.getAuthString());
+            LoadGame loadGame = new LoadGame(Integer.parseInt(command.getGameid()));
+            session.getRemote().sendString(jsonMapper.toJson(loadGame));
+            connections.broadcast(command.getAuthString(), jsonMapper.toJson(new Notification(localUsername + " has joined the game as the " + command.getPlayerColor() + "player." )));
+        }
+        catch (Exception e){
+            Error error = new Error("Error Joining Player: " + e.getMessage());
+            session.getRemote().sendString(jsonMapper.toJson(error));
+        }
     }
 
     private void join_observer(String message, Session session) throws IOException{

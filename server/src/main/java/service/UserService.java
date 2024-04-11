@@ -86,4 +86,18 @@ public class UserService {
             }
         }
 
+        public String getUsername(String authToken) throws Exception{
+            try {
+                String username = this.userDAO.getUsername(authToken);
+                if (username == null) {
+                    throw new DataAccessException("This is not a valid AuthToken");
+                }
+                return username;
+            }
+            catch(Exception e){
+                throw new DataAccessException("Unable to retrieve user " + e.getMessage());
+            }
+
+        }
+
 }
