@@ -258,6 +258,7 @@ public class Server {
         });
 
     }
+
     public int run(int desiredPort) {
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");
@@ -284,6 +285,8 @@ public class Server {
     public void onMessage(Session session, String message) throws Exception {
         System.out.printf("Received: %s", message);
         session.getRemote().sendString("WebSocket response: " + message);
+        Spark.webSocket("/connect", WSServer.class);
+
     }
 
 }

@@ -20,7 +20,7 @@ public class WebSocketFacade extends Endpoint {
 
     public WebSocketFacade(String url, websocket.NotificationHandler notificationHandler) throws Exception {
         try {
-            url = url.replace("http", "ws");
+            url = url.replace("http:", "ws://");
             URI socketURI = new URI(url + "/connect");
             this.notificationHandler = notificationHandler;
 
