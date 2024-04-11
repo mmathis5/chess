@@ -18,10 +18,6 @@ public class GameData {
         this.gameIsComplete = gameIsComplete;
     }
 
-    public void setGameID(Integer gameID) {
-        this.gameID = gameID;
-    }
-
     public Boolean getGameIsComplete() {
         return gameIsComplete;
     }

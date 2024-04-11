@@ -1,15 +1,12 @@
 package server.websocket;
 
 import chess.ChessMove;
-import chess.ChessPosition;
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import dataAccess.*;
 import dataAccess.exceptions.DataAccessException;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import service.ClearService;
 import service.GameService;
 import service.UserService;
 import webSocketMessages.*;
@@ -17,7 +14,6 @@ import webSocketMessages.Error;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Timer;
 
 
 @WebSocket
@@ -49,16 +45,16 @@ public class WebSocketHandler {
         System.out.println("Message received: " + message);
         UserGameCommand userGameCommand = new Gson().fromJson(message, UserGameCommand.class);
         switch (userGameCommand.getCommandType()) {
-            case JOIN_PLAYER -> join_player(message, session);
-            case JOIN_OBSERVER ->  join_observer(message, session);
-            case MAKE_MOVE -> make_move(message, session);
+            case JOIN_PLAYER -> joinPlayer(message, session);
+            case JOIN_OBSERVER ->  joinObserver(message, session);
+            case MAKE_MOVE -> makeMove(message, session);
             case LEAVE -> leave(message, session);
             case RESIGN -> resign(message, session);
 
         }
     }
 
-    private void join_player(String message, Session session) throws IOException{
+    private void joinPlayer(String message, Session session) throws IOException{
         JoinPlayer command = new Gson().fromJson(message, JoinPlayer.class);
         connections.add(command.getAuthString(), session);
         String localUsername = null;
@@ -75,7 +71,7 @@ public class WebSocketHandler {
         }
     }
 
-    private void join_observer(String message, Session session) throws IOException{
+    private void joinObserver(String message, Session session) throws IOException{
         JoinObserver command = new Gson().fromJson(message, JoinObserver.class);
         connections.add(command.getAuthString(), session);
         String localUsername = null;
@@ -92,7 +88,7 @@ public class WebSocketHandler {
             session.getRemote().sendString(jsonMapper.toJson(error));
         }
     }
-    private void make_move(String message, Session session) throws IOException{
+    private void makeMove(String message, Session session) throws IOException{
         MakeMove command = new Gson().fromJson(message, MakeMove.class);
         //i think the connection is already there
         connections.add(command.getAuthString(), session);
@@ -139,27 +135,4 @@ public class WebSocketHandler {
         }
     }
 
-//    private void enter(String visitorName, Session session) throws IOException {
-//        connections.add(visitorName, session);
-//        var message = String.format("%s is in the shop", visitorName);
-//        var notification = new Notification(Notification.Type.ARRIVAL, message);
-//        connections.broadcast(visitorName, notification);
-//    }
-//
-//    private void exit(String visitorName) throws IOException {
-//        connections.remove(visitorName);
-//        var message = String.format("%s left the shop", visitorName);
-//        var notification = new Notification(Notification.Type.DEPARTURE, message);
-//        connections.broadcast(visitorName, notification);
-//    }
-//
-//    public void makeNoise(String petName, String sound) throws ResponseException {
-//        try {
-//            var message = String.format("%s says %s", petName, sound);
-//            var notification = new Notification(Notification.Type.NOISE, message);
-//            connections.broadcast("", notification);
-//        } catch (Exception ex) {
-//            throw new ResponseException(500, ex.getMessage());
-//        }
-//    }
 }
