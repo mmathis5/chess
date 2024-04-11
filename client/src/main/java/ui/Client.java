@@ -8,6 +8,8 @@ import com.google.gson.*;
 import model.GameData;
 //import server.Server;
 import ui.DrawingChessBoard.ChessBoardUI;
+import websocket.WebSocketFacade;
+
 import java.util.*;
 
 public class Client implements ServerMessageObserver {
@@ -19,8 +21,9 @@ public class Client implements ServerMessageObserver {
     Integer gameNumber;
     JsonArray jsonOfGames;
     Scanner scanner = new Scanner(System.in);
+    private final String serverURL = "http:localhost:8080";
     private ServerFacade serverFacade;
-    private client.websocket.WebSocketFacade ws;
+    private WebSocketFacade ws;
 
     private HashMap<Integer, JsonElement> gamesListHashMap = new HashMap<Integer, JsonElement>();
 
@@ -290,20 +293,21 @@ public class Client implements ServerMessageObserver {
             String gameID = gameJson.getAsJsonObject().get("gameID").toString();
             //Establish a Websocket connection with the http server
 
-            //make the http call
-
             serverFacade.joinGame(this.authToken, gameID, playerColor);
-            getGamesJson();
 
             //try to make the dumb web socket connection
+            ws = new WebSocketFacade(serverURL, null);
+            ws.joinGame(username);
+            String message = String.format("you joined the game as %s", username);
+            System.out.println(message);
 
             //get the game board
+            getGamesJson();
             Gson gson2 = new Gson();
             GameData chessGame = gson2.fromJson(gameJson, GameData.class);
             this.inGameplayMode = true;
             this.chessBoardUI.setChessBoard(chessGame.getChessBoard());
             drawBoardProperOrientation(chessGame.getChessBoard(), false);
-
 
             gameplayMode();
         } catch (Exception e) {

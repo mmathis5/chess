@@ -21,7 +21,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.1.1</version>
                 <configuration>
-                    <mainClass>ServerMain</mainClass>
+                    <mainClass>Main</mainClass>
                 </configuration>
             </plugin>
             <plugin>
@@ -38,7 +38,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        ServerMain
+                                        Main
                                     </mainClass>
                                 </manifest>
                             </archive>
@@ -59,27 +59,15 @@
             <version>1.0.0</version>
         </dependency>
         <dependency>
+            <groupId>edu.byu.cs240</groupId>
+            <artifactId>server</artifactId>
+            <scope>test</scope>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.glassfish.tyrus.bundles</groupId>
             <artifactId>tyrus-standalone-client</artifactId>
             <version>1.15</version>
-        </dependency>
-        <dependency>
-            <groupId>edu.byu.cs240</groupId>
-            <artifactId>passoff-dependencies</artifactId>
-            <version>1.0</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>edu.byu.cs240</groupId>
-            <artifactId>passoff-dependencies</artifactId>
-            <version>1.0</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>edu.byu.cs240</groupId>
-            <artifactId>passoff-dependencies</artifactId>
-            <version>1.0</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
