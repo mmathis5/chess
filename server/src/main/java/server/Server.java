@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import dataAccess.exceptions.*;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
+import server.websocket.WebSocketHandler;
 import spark.*;
 import service.*;
 import dataAccess.*;
@@ -26,6 +27,7 @@ public class Server {
     private final AuthDAO authDAO;
 
     private final GameDAO gameDAO;
+    private final WebSocketHandler webSocketHandler;
 
     public Server(){
         try {
@@ -33,6 +35,7 @@ public class Server {
             gameDAO = new SQLGameDAO();
             userDAO = new SQLUserDAO();
             authDAO = new SQLAuthDAO();
+            webSocketHandler = new WebSocketHandler();
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         } catch (SQLException e) {
@@ -263,6 +266,7 @@ public class Server {
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");
 
+        Spark.webSocket("/connect",  webSocketHandler);
 
         clearEndpoint();
         registerEndpoint();
