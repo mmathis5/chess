@@ -42,7 +42,7 @@ public class Server {
             throw new RuntimeException(e);
         }
         this.userService = new UserService(userDAO, authDAO);
-        this.gameService = new GameService(gameDAO, authDAO);
+        this.gameService = new GameService(gameDAO, authDAO, userDAO);
         this.clearService = new ClearService(userDAO, gameDAO, authDAO);
     }
 
@@ -232,12 +232,12 @@ public class Server {
                     //case where playerColor is provided
                     String playerColor = jsonObject.get("playerColor").getAsString();
                     Integer gameID = jsonObject.get("gameID").getAsInt();
-                    this.gameService.joinGame(gameID, playerColor, authToken);
+                    this.gameService.joinGame(gameID, playerColor, authToken, true);
                 }
                 catch (NullPointerException e){
                     //case where playerColor is not provided
                     Integer gameID = jsonObject.get("gameID").getAsInt();
-                    this.gameService.joinGame(gameID, null, authToken);
+                    this.gameService.joinGame(gameID, null, authToken, true);
                 }
                 Integer gameID = jsonObject.get("gameID").getAsInt();
                 return new Gson().toJson(Map.of("gameID", gameID));

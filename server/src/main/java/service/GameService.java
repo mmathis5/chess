@@ -1,6 +1,11 @@
 package service;
 
+import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import dataAccess.AuthDAO;
+import dataAccess.UserDAO;
 import dataAccess.exceptions.BadRequestException;
 import dataAccess.exceptions.DataAccessException;
 import dataAccess.exceptions.InternalFailureException;
@@ -8,15 +13,22 @@ import dataAccess.exceptions.JoinGameColorException;
 import dataAccess.GameDAO;
 import model.*;
 
+import java.io.IOException;
+import java.rmi.server.ExportException;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Objects;
 
 public class GameService {
     private GameDAO gameDAO;
     private AuthDAO authDAO;
-    public GameService(GameDAO gameDAO, AuthDAO authDAO){
+    private UserDAO userDAO;
+    public GameService(GameDAO gameDAO, AuthDAO authDAO, UserDAO userDAO){
         this.gameDAO = gameDAO;
         this.authDAO = authDAO;
+        this.userDAO = userDAO;
     }
 
     public int createGame(String authToken, String gameName) throws DataAccessException, InternalFailureException{
@@ -56,7 +68,9 @@ public class GameService {
         }
     }
 
-    public void joinGame(Integer gameID, String playerColor, String authToken) throws DataAccessException, InternalFailureException, BadRequestException, JoinGameColorException {
+
+
+    public void joinGame(Integer gameID, String playerColor, String authToken, Boolean usernameCanBeNull) throws DataAccessException, InternalFailureException, BadRequestException, JoinGameColorException {
         try{
             //validates that authToken is valid
             if (this.authDAO.getAuth(authToken) == null) {
@@ -75,23 +89,34 @@ public class GameService {
             GameData game = this.gameDAO.getGame(gameID);
             if (Objects.equals(playerColor, "WHITE")){
                 //check if the white player is taken
-                if (game.getWhiteUser() != null){
+                if (game.getWhiteUser() == null || Objects.equals(this.userDAO.getUsername(authToken), game.getWhiteUser())){
+                    if (game.getWhiteUser() == null && !usernameCanBeNull){
+                        throw new Exception("You haven't called the appropriate http endpoint");
+                    }
+                    game.setWhiteUser(username);
+                }
+                else{
                     throw new JoinGameColorException("The white user is already taken");
                 }
-                game.setWhiteUser(username);
             }
             if (Objects.equals(playerColor, "BLACK")){
                 //check if the black player is taken
-                if (game.getBlackUser() != null){
-                    throw new JoinGameColorException("The black user is already taken");
+                if (game.getBlackUser() == null || Objects.equals(this.userDAO.getUsername(authToken), game.getBlackUser())){
+                    if (game.getBlackUser() == null && !usernameCanBeNull){
+                        throw new Exception("You haven't called the appropriate http endpoint");
+                    }
+                    game.setBlackUser(username);
                 }
-                game.setBlackUser(username);
+                else{
+                    throw new JoinGameColorException("The white user is already taken");
+                }
             }
             if (playerColor == null){
                 game.addObserver(username);
             }
             //update the game in the hashMap
             this.gameDAO.updateGame(gameID, game);
+
         }
         catch (DataAccessException | JoinGameColorException | BadRequestException e){
             throw e;
@@ -99,5 +124,39 @@ public class GameService {
         catch (Exception e){
             throw new InternalFailureException("Something went wrong internally");
         }
+    }
+
+    public void makeValidMove(Integer gameID, ChessMove chessMove) throws SQLException, IOException, ClassNotFoundException {
+        boolean isValidMove = false;
+        try{
+            GameData gameData = gameDAO.getGame(gameID);
+
+            ChessPosition startingPosition = chessMove.getStartPosition();
+            ChessPosition endPosition = chessMove.getEndPosition();
+            ChessBoard chessBoard = gameData.getChessBoard();
+            ChessGame chessGame = gameData.getChessGame();
+            Collection<ChessMove> validMoves = chessGame.validMoves(startingPosition);
+            //check if the move is valid
+            Iterator<ChessMove> validMovesIterator = validMoves.iterator();
+            while (validMovesIterator.hasNext()){
+                ChessMove potentialMove = validMovesIterator.next();
+                if (Objects.equals(chessMove, potentialMove)){
+                    isValidMove = true;
+                    break;
+                }
+            }
+            if (isValidMove = false){
+                throw new Exception("Your provided Move is Invalid:(");
+            }
+            //assuming the move is valid, make the move.
+            chessGame.makeMove(chessMove);
+            gameData.setChessGame(chessGame);
+            gameDAO.updateGame(gameID, gameData);
+
+        }
+        catch (Exception e){
+            System.out.println("Error makeValidMove " + e.getMessage());
+        }
+
     }
 }

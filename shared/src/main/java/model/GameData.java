@@ -13,6 +13,11 @@ public class GameData {
 
     private String blackUsername;
     private String gameName;
+
+    public ChessGame getChessGame() {
+        return chessGame;
+    }
+
     private ChessGame chessGame = new ChessGame();
     private ArrayList<String> observers = new ArrayList<String>();
 

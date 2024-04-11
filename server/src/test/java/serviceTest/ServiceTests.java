@@ -52,7 +52,7 @@ class ServiceTests {
     }
 
     UserService userService = new UserService(userDAO, authDAO);
-  GameService gameService = new GameService(gameDAO, authDAO);
+  GameService gameService = new GameService(gameDAO, authDAO, userDAO);
   ClearService clearService = new ClearService(userDAO, gameDAO, authDAO);
 
   @Test
@@ -144,7 +144,7 @@ class ServiceTests {
     AuthData authData = userService.login("Maddie2468", "1");
     String authToken = authData.getAuthToken();
     Integer gameID = gameService.createGame(authToken, "gameName");
-    Assertions.assertDoesNotThrow(() -> gameService.joinGame(gameID, "WHITE", authToken));
+    Assertions.assertDoesNotThrow(() -> gameService.joinGame(gameID, "WHITE", authToken, true));
   }
 
   @Test
@@ -154,7 +154,7 @@ class ServiceTests {
     String fakeAuth = "fakeAuth";
     Integer fakeGameID = 33;
     Assertions.assertThrows(DataAccessException.class, () -> {
-      gameService.joinGame(fakeGameID, null, fakeAuth);
+      gameService.joinGame(fakeGameID, null, fakeAuth, true);
     }, "Incorrect authToken should throw an error");
   }
 

@@ -49,7 +49,7 @@ public class Client implements NotificationHandler {
             Error notification = new Gson().fromJson(message, Error.class);
             System.out.println("Error: " + notification.getErrorMessage());
         }
-
+        gameplayMode();
     }
 
     public void preLogin() {
@@ -131,8 +131,19 @@ public class Client implements NotificationHandler {
             System.out.println("6. Highlight Legal Moves");
             System.out.println("Enter Command: ");
             String input = scanner.nextLine();
+            if (Objects.equals(input, "5")) {
+                resign();
+                inGameplayMode = false;
+                break;
+            }
+            if (Objects.equals(input, "3")) {
+                leaveGame();
+                inGameplayMode = false;
+                break;
+            }
             evalGameplayMode(input);
         }
+        postLogin();
     }
 
     public void evalGameplayMode(String input) {
@@ -308,9 +319,8 @@ public class Client implements NotificationHandler {
             updateHashMapValue(Integer.valueOf(number), gameJson);
             //using the number, get the gameID
             String gameID = gameJson.getAsJsonObject().get("gameID").toString();
-            //Establish a Websocket connection with the http server
-
-            //serverFacade.joinGame(this.authToken, gameID, playerColor);
+            //call the http thing
+            this.serverFacade.joinGame(authToken, gameID, playerColor);
 
             //try to make the dumb web socket connection
             ws = new WebSocketFacade(serverURL, this);
@@ -341,10 +351,27 @@ public class Client implements NotificationHandler {
         JsonElement jsonElement = gamesListHashMap.get(Integer.valueOf(number));
         if (Objects.equals(desiredColor, "WHITE")) {
             JsonElement whiteUserJson = jsonElement.getAsJsonObject().get("whiteUsername");
-            return whiteUserJson == null;
-        } else if (Objects.equals(desiredColor, "BLACK")) {
+            try{
+                if (Objects.equals(whiteUserJson.toString().substring(1, whiteUserJson.toString().length() - 1), username) || whiteUserJson.isJsonNull()){
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception e){
+                return false;
+            }
+        }
+        else if (Objects.equals(desiredColor, "BLACK")) {
             JsonElement blackUserJson = jsonElement.getAsJsonObject().get("blackUsername");
-            return blackUserJson == null;
+            try{
+                if (Objects.equals(blackUserJson.toString(), username) || blackUserJson.isJsonNull()){
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception e){
+                return false;
+            }
         }
         return false;
     }
@@ -364,7 +391,7 @@ public class Client implements NotificationHandler {
     private void redrawChessBoard() {
         ChessBoard currBoard = getCurrBoard();
         drawBoardProperOrientation(currBoard, false);
-        gameplayMode();
+    //    gameplayMode();
     }
 
 

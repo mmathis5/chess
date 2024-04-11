@@ -1,11 +1,10 @@
 package websocket;
 
+import chess.ChessMove;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.sun.nio.sctp.NotificationHandler;
-import webSocketMessages.JoinPlayer;
-import webSocketMessages.ServerMessage;
-import webSocketMessages.UserGameCommand;
+import webSocketMessages.*;
 
 
 import javax.websocket.*;
@@ -66,14 +65,28 @@ public class WebSocketFacade extends Endpoint {
         }
 
     }
-    public void joinObserver(String authToken, String gameID){
-
+    public void joinObserver(String authToken, String gameID) throws IOException {
+        try{
+            JoinObserver joinObserver = new JoinObserver(authToken, Integer.parseInt(gameID));
+            this.session.getBasicRemote().sendText(jsonMapper.toJson(joinObserver));
+        }
+        catch (Exception e){
+            System.out.println("Error: " + e.getMessage());
+            throw e;
+        }
     }
     public void leaveGame(String visitorName) throws Exception{
 
     }
-    public void makeMove(String visitorName) throws Exception{
-
+    public void makeMove(String authToken, String gameID, ChessMove move) throws Exception{
+        try{
+            MakeMove makeMove = new MakeMove(authToken, Integer.parseInt(gameID), move);
+            this.session.getBasicRemote().sendText(jsonMapper.toJson(makeMove));
+        }
+        catch (Exception e){
+            System.out.println("Error: " + e.getMessage());
+            throw e;
+        }
     }
 
 
