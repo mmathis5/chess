@@ -10,9 +10,11 @@ import java.util.Objects;
  */
 public class UserGameCommand {
 
-    public UserGameCommand(String authToken) {
+    public UserGameCommand(CommandType commandType, String authToken) {
         this.authToken = authToken;
+        this.commandType = commandType;
     }
+
 
     public enum CommandType {
         JOIN_PLAYER,
@@ -21,6 +23,7 @@ public class UserGameCommand {
         LEAVE,
         RESIGN
     }
+
 
     protected CommandType commandType;
 
