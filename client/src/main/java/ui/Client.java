@@ -14,6 +14,7 @@ import webSocketMessages.ServerMessage;
 import websocket.NotificationHandler;
 import websocket.WebSocketFacade;
 
+import java.awt.*;
 import java.util.*;
 
 public class Client implements NotificationHandler {
@@ -31,6 +32,8 @@ public class Client implements NotificationHandler {
     private ServerFacade serverFacade;
     private WebSocketFacade ws;
     private JsonObject jsonMapper = new JsonObject();
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_RED = "\u001B[31m";
 
     private HashMap<Integer, JsonElement> gamesListHashMap = new HashMap<Integer, JsonElement>();
 
@@ -39,20 +42,16 @@ public class Client implements NotificationHandler {
     }
 
     public void notify(String message, ServerMessage.ServerMessageType type){
-        System.out.println("message recieved: " + type);
-        System.out.println(message);
-        System.out.println(type+ ": " + message);
-
         if (type == ServerMessage.ServerMessageType.LOAD_GAME){
             redrawChessBoard();
         }
         else if (type == ServerMessage.ServerMessageType.NOTIFICATION){
             Notification notification = new Gson().fromJson(message, Notification.class);
-            System.out.println("Notification: " + notification.getMessage());
+            System.out.println(ANSI_RED + "Notification: " + notification.getMessage() + ANSI_RESET);
         }
         else if(type ==  ServerMessage.ServerMessageType.ERROR){
             Error notification = new Gson().fromJson(message, Error.class);
-            System.out.println("Error: " + notification.getErrorMessage());
+            System.out.println(ANSI_RED + "Error: " + notification.getErrorMessage() + ANSI_RESET);
         }
 
     }
@@ -246,6 +245,14 @@ public class Client implements NotificationHandler {
         }
     }
 
+    public void updateGamesHashMap(){
+        for (int number = 1; number < this.jsonOfGames.size() + 1; number++) {
+            JsonElement jsonElement = this.jsonOfGames.get(number - 1);
+            //add into the hashMap
+            updateHashMapValue(number, jsonElement);
+        }
+
+    }
     public void listGames() {
         try {
             getGamesJson();
@@ -377,7 +384,8 @@ public class Client implements NotificationHandler {
 
     private void redrawChessBoard() {
         try{
-            joinGame(false, false);
+            getGamesJson();
+            updateGamesHashMap();
             ChessBoard currBoard = getCurrBoard();
             drawBoardProperOrientation(currBoard, false);
             System.out.println("Enter Command:");
@@ -429,7 +437,6 @@ public class Client implements NotificationHandler {
             if (gameData.getGameIsComplete()) {
                 new Error("This game is complete. Please leave the game.");
             }
-
             ChessPosition selectedPosition = getValidCoordinates("piece you wish to move?");
             ChessPosition newLocation = getValidCoordinates("location you wish to move the piece to?");
             System.out.println("Do you wish to add a promotional piece to this move? (y/n)");

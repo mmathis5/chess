@@ -4,6 +4,7 @@ import chess.ChessMove;
 import com.google.gson.Gson;
 import dataAccess.*;
 import dataAccess.exceptions.DataAccessException;
+import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
@@ -14,6 +15,7 @@ import webSocketMessages.Error;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Objects;
 
 
 @WebSocket
@@ -90,19 +92,28 @@ public class WebSocketHandler {
     }
     private void makeMove(String message, Session session) throws IOException{
         MakeMove command = new Gson().fromJson(message, MakeMove.class);
-        //i think the connection is already there
         connections.add(command.getAuthString(), session);
         String localUsername = null;
         try{
             //get the chess move
             ChessMove desiredMove = command.getChessMove();
             Integer gameID = command.getGameID();
+            GameData gameData = gameService.getGame(gameID);
+            //check if the game is complete
+            if (gameData.getGameIsComplete()){
+                throw new Exception("This game is complete. Please leave it at your leisure");
+            }
+            //check if this is an observer
+            localUsername = userService.getUsername(command.getAuthString());
+            if (!Objects.equals(gameData.getWhiteUser(), localUsername) && !Objects.equals(gameData.getBlackUser(), localUsername)){
+                throw new Exception("An observer cannot make a move");
+            }
             gameService.makeValidMove(gameID, desiredMove);
 
-            localUsername = userService.getUsername(command.getAuthString());
             LoadGame loadGame = new LoadGame(command.getGameID());
             session.getRemote().sendString(jsonMapper.toJson(loadGame));
             connections.broadcast(command.getAuthString(), jsonMapper.toJson(new Notification(localUsername + " has just made a move")));
+            connections.broadcast(command.getAuthString(), jsonMapper.toJson(loadGame));
         }
         catch (Exception e){
             Error error = new Error("Error making move: " + e.getMessage());
@@ -127,6 +138,19 @@ public class WebSocketHandler {
         connections.remove(command.getAuthString());
         try{
             String localUsername = userService.getUsername(command.getAuthString());
+            Integer gameID = command.getGameID();
+            GameData gameData = gameService.getGame(gameID);
+            localUsername = userService.getUsername(command.getAuthString());
+            //check if the game is complete
+            if (!Objects.equals(gameData.getWhiteUser(), localUsername) && !Objects.equals(gameData.getBlackUser(), localUsername)){
+                throw new Exception("An observer cannot resign");
+            }
+            if (gameData.getGameIsComplete()){
+                throw new Exception("This game is complete. As such, you cannot resign");
+            }
+
+            gameService.resign(command.getGameID());
+            session.getRemote().sendString(jsonMapper.toJson(new Notification(localUsername + " has resigned from the game")));
             connections.broadcast(command.getAuthString(), jsonMapper.toJson(new Notification(localUsername + " has resigned from the game")));
         }
         catch(Exception e){

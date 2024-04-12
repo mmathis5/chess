@@ -93,6 +93,7 @@ public class ChessGame {
         if (piece == null){
             throw new InvalidMoveException("there is no piece at the starting location");
         }
+        //check if move is for a piece that is not their color
         ArrayList<ChessMove> moves = new ArrayList<>();
         moves.addAll(this.board.getPiece(move.getStartPosition()).pieceMoves(board, move.getStartPosition()));
         ChessGame.TeamColor team = board.getPiece(move.getStartPosition()).getTeamColor();

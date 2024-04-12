@@ -31,6 +31,18 @@ public class GameService {
         this.userDAO = userDAO;
     }
 
+    public void resign(int gameID) throws SQLException, IOException, ClassNotFoundException {
+        try{
+            GameData gameData = getGame(gameID);
+            gameData.setGameIsComplete(true);
+            gameDAO.updateGame(gameID, gameData);
+        }
+        catch (Exception e){
+            throw e;
+        }
+
+
+    }
     public int createGame(String authToken, String gameName) throws DataAccessException, InternalFailureException{
         try {
             //validates that authToken is valid
@@ -48,6 +60,14 @@ public class GameService {
         }
         catch(Exception e){
             throw new InternalFailureException("something went wrong internally");
+        }
+    }
+    public GameData getGame(int gameID) throws SQLException, IOException, ClassNotFoundException {
+        try{
+            return this.gameDAO.getGame(gameID);
+        }
+        catch (Exception e){
+            throw e;
         }
     }
 
@@ -126,7 +146,7 @@ public class GameService {
         }
     }
 
-    public void makeValidMove(Integer gameID, ChessMove chessMove) throws SQLException, IOException, ClassNotFoundException {
+    public void makeValidMove(Integer gameID, ChessMove chessMove) throws Exception {
         boolean isValidMove = false;
         try{
             GameData gameData = gameDAO.getGame(gameID);
@@ -159,7 +179,7 @@ public class GameService {
 
         }
         catch (Exception e){
-            System.out.println("Error makeValidMove " + e.getMessage());
+            throw new Exception(e.getMessage());
         }
 
     }
