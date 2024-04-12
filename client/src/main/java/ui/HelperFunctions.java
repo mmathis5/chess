@@ -20,6 +20,9 @@ public class HelperFunctions{
     public boolean helperPlayerIsAvailable(String username, String desiredColor, JsonElement jsonElement){
         if (Objects.equals(desiredColor, "WHITE")) {
             JsonElement whiteUserJson = jsonElement.getAsJsonObject().get("whiteUsername");
+            if (whiteUserJson == null){
+                return true;
+            }
             try{
                 if (Objects.equals(whiteUserJson.toString().substring(1, whiteUserJson.toString().length() - 1), username) || whiteUserJson.isJsonNull()){
                     return true;
@@ -32,6 +35,9 @@ public class HelperFunctions{
         }
         else if (Objects.equals(desiredColor, "BLACK")) {
             JsonElement blackUserJson = jsonElement.getAsJsonObject().get("blackUsername");
+            if (blackUserJson == null){
+                return true;
+            }
             try{
                 if (Objects.equals(blackUserJson.toString().substring(1, blackUserJson.toString().length() - 1), username) || blackUserJson.isJsonNull()){
                     return true;
